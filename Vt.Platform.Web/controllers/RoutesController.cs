@@ -39,7 +39,7 @@ namespace Vt.Platform.Web.controllers
             return Ok(new {
               pages = pages,
               content = Directory.EnumerateFiles(p, "*.*", SearchOption.AllDirectories)
-                  .Select(x => x.Replace(p,"").Replace("\\","/"))
+                  .Select(x => x.Replace(p,"").Replace("\\","/").ToLowerInvariant())
             });
         }
     }

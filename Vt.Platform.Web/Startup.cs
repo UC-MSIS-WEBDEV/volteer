@@ -74,7 +74,7 @@ namespace Vt.Platform.Web
             var sv = value.ToString();
             if (string.IsNullOrWhiteSpace(sv)) { return sv; }
 
-            return value + ".html";
+            return (value + "/index.html").ToLowerInvariant();
         }
     }
 }
