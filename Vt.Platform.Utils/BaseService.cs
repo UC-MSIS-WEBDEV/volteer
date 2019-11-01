@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Vt.Platform.Utils.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,8 @@ namespace Vt.Platform.Utils
         {
             Logger = logger;
         }
+
+        protected static HttpClient HttpClient = new HttpClient();
         public ILogger Logger { get; }
         protected abstract Task<TRes> Implementation(TReq request);
         

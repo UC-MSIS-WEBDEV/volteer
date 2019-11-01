@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tokenize.Client;
+using Vt.Platform.AzureDataTables.BlobStorage;
 using Vt.Platform.AzureDataTables.Messaging;
 using Vt.Platform.AzureDataTables.Repositories;
 using Vt.Platform.Domain.Messaging;
@@ -30,6 +31,7 @@ namespace Vt.Platform.Functions
 
             builder.Services.AddTransient<IEmailService, EmailService>();
             builder.Services.AddTransient<IRandomGenerator, RandomGenerator>();
+            builder.Services.AddTransient<IStaticSiteStorageService, StaticSiteBlobStorageService>();
 
             builder.Services.AddTransient<ITestContactRepository, TestContactRepository>();
 

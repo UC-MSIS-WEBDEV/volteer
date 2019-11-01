@@ -5,30 +5,34 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Tokenize.Client;
 using Vt.Platform.Domain.PublicServices.System;
+using Vt.Platform.Domain.Services;
 using Vt.Platform.Utils;
 
 namespace Vt.Platform.Functions.HttpTriggers.System
 {
-    public class HealthCheckFunction
+    public class UpdateStaticSiteFunction
     {
-        private readonly ILogger<HealthCheckFunction> _logger;
+        private readonly ILogger<UpdateStaticSiteFunction> _logger;
         private readonly IObjectTokenizer _objectTokenizer;
+        private readonly IStaticSiteStorageService _staticSiteStorageService;
 
-        public HealthCheckFunction(
-            ILogger<HealthCheckFunction> logger, 
-            IObjectTokenizer objectTokenizer)
+        public UpdateStaticSiteFunction(
+            ILogger<UpdateStaticSiteFunction> logger,
+            IObjectTokenizer objectTokenizer,
+            IStaticSiteStorageService staticSiteStorageService)
         {
             _logger = logger;
             _objectTokenizer = objectTokenizer;
+            _staticSiteStorageService = staticSiteStorageService;
         }
 
-        [FunctionName("HealthCheck")]
+        [FunctionName("UpdateStaticSite")]
         public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
         {
             var response = await req.CallService(
-                () => new HealthCheckService(_logger), 
-                _objectTokenizer, 
+                () => new UpdateStaticSiteService(_logger, _staticSiteStorageService), 
+                _objectTokenizer,
                 HttpMethod.Get,
                 HttpMethod.Post);
             return response;
