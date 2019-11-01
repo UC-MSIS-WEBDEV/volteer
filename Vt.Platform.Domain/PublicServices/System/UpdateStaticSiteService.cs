@@ -26,7 +26,7 @@ namespace Vt.Platform.Domain.PublicServices.System
             var contentMap = await HttpClient.GetStringAsync(siteUrl + "/api/routes");
             var map = JsonConvert.DeserializeObject<StaticSiteApiModel>(contentMap);
 
-            foreach (var content in map.Content)
+            foreach (var content in map.Contents)
             {
                 var res = await HttpClient.GetAsync(siteUrl + content);
                 if (res.IsSuccessStatusCode)
@@ -41,7 +41,7 @@ namespace Vt.Platform.Domain.PublicServices.System
             {
                 var res = await HttpClient.GetAsync(siteUrl + page);
                 var data = await res.Content.ReadAsByteArrayAsync();
-                await _staticSiteStorageService.StoreContent(page, res.Content.Headers.ContentType.MediaType, data);
+                await _staticSiteStorageService.StoreContent(page + "/index.html", res.Content.Headers.ContentType.MediaType, data);
 
             }
 

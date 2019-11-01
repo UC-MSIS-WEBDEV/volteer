@@ -31,14 +31,14 @@ namespace Vt.Platform.Web.controllers
             var p = _hostingEnvironment.WebRootPath;
 
             var results = _actionDescriptorCollectionProvider.ActionDescriptors.Items;
-            var exceptions = new[] {"api/Routes", ""};
+            var exceptions = new[] {"api/Routes"};
             var pages = results.Select(x => x.AttributeRouteInfo.Template)
                                .Except(exceptions)
                                .Select(x => "/" + x);
 
             return Ok(new {
               pages = pages,
-              content = Directory.EnumerateFiles(p, "*.*", SearchOption.AllDirectories)
+              contents = Directory.EnumerateFiles(p, "*.*", SearchOption.AllDirectories)
                   .Select(x => x.Replace(p,"").Replace("\\","/").ToLowerInvariant())
             });
         }

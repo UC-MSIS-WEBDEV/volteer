@@ -74,7 +74,20 @@ namespace Vt.Platform.Web
             var sv = value.ToString();
             if (string.IsNullOrWhiteSpace(sv)) { return sv; }
 
-            return (value + "/index.html").ToLowerInvariant();
+            return value.ToString().ToLowerInvariant();
+        }
+    }
+
+    public class DotParameterTransformer : IOutboundParameterTransformer
+    {
+        public string TransformOutbound(object value)
+        {
+            if (value == null) { return null; }
+
+            var sv = value.ToString();
+            if (string.IsNullOrWhiteSpace(sv)) { return sv; }
+
+            return (value + ".html").ToLowerInvariant();
         }
     }
 }
