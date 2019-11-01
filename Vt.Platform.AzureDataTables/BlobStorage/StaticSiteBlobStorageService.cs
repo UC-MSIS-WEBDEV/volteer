@@ -18,7 +18,8 @@ namespace Vt.Platform.AzureDataTables.BlobStorage
         public async Task StoreContent(string path, string contentType, byte[] content)
         {
             path = path.Substring(1, path.Length - 1);
-            CloudBlobContainer cloudBlobContainer = BlobClient.GetContainerReference("web");
+            var container = Environment.GetEnvironmentVariable("Blob.WebContainer");
+            CloudBlobContainer cloudBlobContainer = BlobClient.GetContainerReference(container);
             CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(path.ToLowerInvariant());
             cloudBlockBlob.Properties.ContentType = contentType;
             await cloudBlockBlob.UploadFromByteArrayAsync(content, 0, content.Length);
