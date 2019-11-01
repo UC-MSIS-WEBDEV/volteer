@@ -41,7 +41,10 @@ namespace Vt.Platform.Domain.PublicServices.System
             {
                 var res = await HttpClient.GetAsync(siteUrl + page);
                 var data = await res.Content.ReadAsByteArrayAsync();
-                await _staticSiteStorageService.StoreContent(page + "/index.html", res.Content.Headers.ContentType.MediaType, data);
+
+                var p = page;
+                if (p == "/")  p = "";
+                await _staticSiteStorageService.StoreContent(p + "/index.html", res.Content.Headers.ContentType.MediaType, data);
 
             }
 
