@@ -38,6 +38,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
         public class Request : BaseRequest
         {
+            [Required]
             public string EventCode { get; set; }
         }
 
@@ -49,6 +50,13 @@ namespace Vt.Platform.Domain.PublicServices.Events
             public string Summary { get; set; }
             public string Details { get; set; }
             public int NumberOfParticipantsRequested { get; set; }
+            public string Address1 { get; set; }
+            public string Address2 { get; set; }
+            public string City { get; set; }
+            public string State { get; set; }
+            public string PostalCode { get; set; }
+            public double? Latitude { get; set; }
+            public double? Longitude { get; set; }
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -45,6 +46,8 @@ namespace Vt.Platform.Utils
             where TReq : BaseRequest, new()
             where TRes : BaseResponse, new()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             methods = methods.Length > 0 ? methods : new[] { HttpMethod.Post };
 
             var svc = service();
@@ -85,7 +88,7 @@ namespace Vt.Platform.Utils
                 return CreateResponse(
                     correlationId,
                     HttpStatusCode.InternalServerError,
-                    new ExceptionResponse(ex, correlationId));
+                    new ExceptionResponse(ex, correlationId), sw);
             }
 
             try
@@ -97,20 +100,20 @@ namespace Vt.Platform.Utils
                 var httpStatus = ConvertServiceResponseToHttpStatusCode(result);
                 svc.Logger.LogInformation($"HTTP STATUS CODE: {svc.ServiceName} {req.CorrelationId}");
 
-                return CreateResponse(correlationId, httpStatus, result);
+                return CreateResponse(correlationId, httpStatus, result, sw);
             }
             catch (ResourceNotFoundException)
             {
                 svc.Logger.LogInformation($"Resource not found for {httpReq.RequestUri}");
-                return CreateResponse(correlationId, HttpStatusCode.NotFound, new ResourceNotFoundResponse());
+                return CreateResponse(correlationId, HttpStatusCode.NotFound, new ResourceNotFoundResponse(), sw);
             }
             catch (Exception ex)
             {
                 svc.Logger.LogError(ex, "There was a problem processing the request");
                 return CreateResponse(
-                    correlationId, 
-                    HttpStatusCode.InternalServerError, 
-                    new ExceptionResponse(ex, correlationId));
+                    correlationId,
+                    HttpStatusCode.InternalServerError,
+                    new ExceptionResponse(ex, correlationId), sw);
             }
         }
 
@@ -234,10 +237,13 @@ namespace Vt.Platform.Utils
 
         }
 
-        private static HttpResponseMessage CreateResponse(Guid correlationId, HttpStatusCode httpStatus, BaseResponse serviceResponse)
+        private static HttpResponseMessage CreateResponse(Guid correlationId, HttpStatusCode httpStatus, BaseResponse serviceResponse, Stopwatch sw)
         {
             var response = new HttpResponseMessage(httpStatus);
             response.Headers.Add("correlation-id", correlationId.ToString());
+
+            serviceResponse.MetaData.Duration = sw.ElapsedMilliseconds;
+            sw.Stop();
 
             response.Content = new StringContent(
                 JsonConvert.SerializeObject(serviceResponse, Settings),

@@ -32,5 +32,6 @@ namespace Vt.Platform.Utils
         public Dictionary<string, string[]> Errors { get; set; }
         public Dictionary<string, string[]> Data { get; set; }
         public string Description { get; set; } = "";
+        public long Duration { get; set; }
     }
 }
