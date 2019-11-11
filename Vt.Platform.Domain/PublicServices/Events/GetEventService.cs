@@ -26,7 +26,14 @@ namespace Vt.Platform.Domain.PublicServices.Events
                 Summary = "Bearcats Homecoming Parade",
                 Details = "Come join the bear cats parade",
                 NumberOfParticipantsRequested = 100,
-                EventDate = DateTime.Now
+                EventDate = DateTime.Now,
+                Latitude = 39.1337922,
+                Longitude = -84.5145203,
+                Address1 = "2906 Woodside Drive",
+                Address2 = "",
+                City = "Cincinnati",
+                PostalCode = "45221",
+                State = "OH"
             };
         }
 
