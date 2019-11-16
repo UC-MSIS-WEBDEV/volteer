@@ -35,6 +35,8 @@ namespace Vt.Platform.Functions
 
             builder.Services.AddTransient<ITestContactRepository, TestContactRepository>();
 
+            builder.Services.AddTransient<IDataRepository, DataRepository>();
+
         }
     }
 }
