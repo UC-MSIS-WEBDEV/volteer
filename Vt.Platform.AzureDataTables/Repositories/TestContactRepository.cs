@@ -12,8 +12,6 @@ namespace Vt.Platform.AzureDataTables.Repositories
 {
     public class TestContactRepository : RepositoryBase, ITestContactRepository
     {
-        protected override string[] TableNames => new[] {"TestContacts"};
-
         public async Task<PersistResponse> PersistContact(TestContactDto testContact)
         {
             var data = new TestContactTable
@@ -26,7 +24,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
             };
             data.UpdateAuditable(testContact);
 
-            var table = await GetTable(TableNames[0]);
+            var table = await GetTable("TestContacts");
             var insertOperation = TableOperation.Insert(data);
             await table.ExecuteAsync(insertOperation);
 

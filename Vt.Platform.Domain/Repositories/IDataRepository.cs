@@ -14,6 +14,7 @@ namespace Vt.Platform.Domain.Repositories
 
         // PARTICIPANT REPOSITORY ACTIONS
         Task<ParticipantDto[]> GetParticipantsAsync(string volteerEventCode);
+        Task<ParticipantDto> GetParticipantAsync(string volteerEventCode, string participantCode);
         Task SaveOrUpdateParticipantAsync(ParticipantDto participant);
 
         // NOTIFICATION REPOSITORY ACTIONS
