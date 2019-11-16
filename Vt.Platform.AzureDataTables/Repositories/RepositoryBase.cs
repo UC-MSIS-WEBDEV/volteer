@@ -16,8 +16,6 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
         private static readonly HashSet<string> InitializedTables = new HashSet<string>();
 
-        protected abstract string[] TableNames { get; }
-
         protected CloudTableClient TableClient { get; }
 
         private static CloudTableClient CreateClient()
@@ -43,16 +41,6 @@ namespace Vt.Platform.AzureDataTables.Repositories
         {
             TableOperation insertOperation = TableOperation.Insert(data);
             return table.ExecuteAsync(insertOperation);
-        }
-
-        public async Task CreateTables()
-        {
-            var client = CreateClient();
-
-            foreach (var table in TableNames)
-            {
-                await client.GetTableReference(table).CreateIfNotExistsAsync();
-            }
         }
     }
 }
