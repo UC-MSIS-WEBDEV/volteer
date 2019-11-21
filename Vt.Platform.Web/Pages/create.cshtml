@@ -1,0 +1,107 @@
+﻿@page
+@model Vt.Platform.Web.Pages.createModel
+@{
+    ViewData["Title"] = "create";
+}
+<style>
+
+    label, input {
+        display: block
+    }
+</style>
+<h1>volteer.us</h1>
+<div id="createEvent">
+    <div class="row">
+        <div class="col-md-6">
+
+            <div style="margin: 20px">
+                <label for="orgName">Organizer Name</label>
+                <input type="text" class="orgName" v-model="orgName" />
+
+            </div>
+            <div style="margin: 20px">
+                Organizer Email
+                <input type="text" class="orgEmail" v-model="orgEmail" />
+            </div>
+            <div style="margin: 20px">
+                Event Date
+                <input type="date" class="eventDate" v-model="eventDate" />
+            </div>
+            <div style="margin: 20px">
+                Number of Participants
+                <input type="text" class="numPart" v-model="numPart" />
+            </div>
+
+        </div>
+        <div class="col-md-6">
+
+            <div style="margin: 20px">
+                Event Summary
+                <input type="text" class="eventSum" v-model="eventSum" />
+            </div>
+            <div style="margin: 20px">
+                Event Details
+                <input type="text" class="eventDet" style="height:100px" v-model="eventDet" />
+            </div>
+            <div style="margin: 20px">
+                Location
+                <input type="text" class="loc" v-model="loc" />
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12" style="align-content:center">
+            <input type="button" id="create" value="Create Event" v-on:click="makeObject" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var createEvent = new Vue({
+            el: '#createEvent',
+            data: {
+                    orgName: '',
+                    orgEmail: '',
+                    eventDate: '',
+                    numPart: '',
+                    eventSum: '',
+                    eventDet: '',
+                    loc: ''
+
+            },
+            methods: {
+                    makeObject: function () {
+                    console.log("clicked");
+                    var newEvent = {
+                        organizerName: createEvent.orgName,
+                        organizerEmail: createEvent.orgEmail,
+                        eventDate: createEvent.eventDate,
+                        numberOfParticipantsRequested: createEvent.numPart,
+                        summary: createEvent.eventSum,
+                        details: createEvent.eventDet,
+                        location: createEvent.loc
+                    }
+                    var jsonObject = JSON.stringify(newEvent);
+                    console.log(jsonObject);
+                    $.ajax({
+                        url: "http://localhost:7071/api/CreateEvent",
+                        dataType: 'json',
+                        crossDomain: true,
+                        contentType: 'application/json',
+                        data: JSON.stringify(newEvent),
+                        method: 'POST'
+                    }).done(function () {
+                        
+                    }).fail(function () {
+                        alert("there wasn an error");
+                    });
+                }
+             }
+
+        })
+
+
+    </script>
+}
