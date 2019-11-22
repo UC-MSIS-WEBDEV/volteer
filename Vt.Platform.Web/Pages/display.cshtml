@@ -1,0 +1,174 @@
+﻿@page
+@model Vt.Platform.Web.Pages.displayModel
+@{
+    ViewData["Title"] = "display";
+}
+    
+        
+<style>
+    input {
+        margin-right: 5px
+    }
+
+    p {
+        display: block
+    }
+    
+   
+
+}
+    
+</style>
+<div id="eventDisplay">
+    <div class="row">
+        <div class="col-md-6">
+            <div>
+                Organizer
+                <p>{{organizerName}}</p>
+            </div>
+            <div>
+                Event
+                <p>{{summary}}</p>
+            </div>
+            <div>
+                Event Details
+                <p>{{eventDate}}</p>
+                <p>{{numberOfParticipantsRequested}}</p>
+                <p>{{details}}</p>
+            </div>
+            <div>
+                Location
+                <p>{{address1}}</p>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <div>
+                Who's Coming?
+
+            </div>
+            <div>
+                <input type="button" id="yes" value="I can come" />
+                <input type="button" id="maybe" value="maybe" />
+                <input type="button" id="yes" value="can't come" />
+            </div>
+
+            <div>
+                <ul>
+                    <li v-for="people in peoples"> {{people.name}}</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        var participants = [];
+        var party = [];
+        $(function() {
+            loadData();
+
+
+                function loadData() {
+                    $.ajax({
+                        url: "http://localhost:7071/api/GetEvent?eventcode=abc123",
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        method: 'GET'
+                    }).done(function (responseJSON, status, xhr) {
+
+                            eventDisplay.organizerName = responseJSON.organizerName;
+                            eventDisplay.summary = responseJSON.summary;
+                            eventDisplay.eventDate = responseJSON.eventDate;
+                            eventDisplay.numberOfParticipantsRequested = responseJSON.numberOfParticipantsRequested;
+                            eventDisplay.details = responseJSON.details;
+                            eventDisplay.address1 = responseJSON.address1;
+
+                    }).fail(function(xhr,status,error) {
+                        console.log("fail", xhr, status, error);
+                        alert("There was an error retrieving the data");
+                    });
+
+            };
+        });
+        var eventDisplay = new Vue({
+            el: '#eventDisplay',
+            data: {
+                    organizerName: '',
+                    summary: '',
+                    eventDate: '',
+                    numberOfParticipantsRequested: '',
+                    details: '',
+                    address1: '',
+                    peoples: []
+
+            },
+            mounted: function () {
+                var self = this;
+                $.ajax({
+                        url: "http://localhost:7071/api/GetParticipants?eventCode=abc123",
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        method: 'GET'
+                    }).done(function (responseJSON, status, xhr) {
+                        $.each(responseJSON.participants, function (index, item) {
+
+                            var newpart = { name: item.name, status: item.status.name };
+                            participants.push(newpart);
+
+                        });
+
+                        self.peoples = participants;
+
+                    }).fail(function(xhr,status,error) {
+                        console.log("fail", xhr, status, error);
+                        alert("There was an error retrieving the data");
+                    });
+            },
+            methods: {
+                    makeObject: function () {
+                    console.log("clicked");
+                    var newEvent = {
+                        organizerName: createEvent.orgName,
+                        organizerEmail: createEvent.orgEmail,
+                        eventDate: createEvent.eventDate,
+                        numberOfParticipantsRequested: createEvent.numPart,
+                        summary: createEvent.eventSum,
+                        details: createEvent.eventDet,
+                        location: createEvent.loc
+                    }
+                    var jsonObject = JSON.stringify(newEvent);
+                    console.log(jsonObject);
+                }
+             }
+
+        })
+        /*var participantDisplay = new Vue({
+            el: '#participantDisplay',
+            data: participants,
+            methods: {
+                    makeObject: function () {
+                    console.log("clicked");
+                    var newEvent = {
+                        organizerName: createEvent.orgName,
+                        organizerEmail: createEvent.orgEmail,
+                        eventDate: createEvent.eventDate,
+                        numberOfParticipantsRequested: createEvent.numPart,
+                        summary: createEvent.eventSum,
+                        details: createEvent.eventDet,
+                        location: createEvent.loc
+                    }
+                    var jsonObject = JSON.stringify(newEvent);
+                    console.log(jsonObject);
+                }
+             }
+
+        })*/
+
+
+    </script>
+}

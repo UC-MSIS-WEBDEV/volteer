@@ -17,6 +17,13 @@ html {
     font-size: 16px;
   }
 }
+@media screen and (max-width: 600px) {
+    div {
+        align-content: center;
+        background-color: aqua;
+        align-items: center;
+    }
+}
 
 .border-top {
   border-top: 1px solid #e5e5e5;

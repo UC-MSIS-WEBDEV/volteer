@@ -4,36 +4,42 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Vt.Platform.Domain.Models.Persistence;
 using Vt.Platform.Domain.PublicServices.System;
+using Vt.Platform.Domain.Repositories;
 using Vt.Platform.Utils;
 
 namespace Vt.Platform.Domain.PublicServices.Events
 {
     public class GetEventService : BaseService<GetEventService.Request, GetEventService.Response>
     {
+        private IDataRepository _dataRepository;
         public GetEventService(ILogger logger) : base(logger)
         {
+            /*_dataRepository = dataRepository;*/
         }
 
         protected override async Task<Response> Implementation(Request request)
         {
             await Task.CompletedTask;
 
+             EventDto RetDto = await _dataRepository.GetEventAsync(request.EventCode);
+
             return new Response
             {
                 EventCode = request.EventCode,
-                OrganizerName = "John Smith",
-                Summary = "Bearcats Homecoming Parade",
-                Details = "Come join the bear cats parade",
-                NumberOfParticipantsRequested = 100,
-                EventDate = DateTime.Now,
-                Latitude = 39.1337922,
-                Longitude = -84.5145203,
+                OrganizerName = RetDto.OrganizerName,
+                Summary = RetDto.EventSummary,
+                Details = RetDto.EventDetails,
+                NumberOfParticipantsRequested = RetDto.NumberOfParticipants,
+                EventDate = RetDto.EventDate,
+                Location = RetDto.EventLocation,
+                /*Longitude = -84.5145203,
                 Address1 = "2906 Woodside Drive",
                 Address2 = "",
                 City = "Cincinnati",
                 PostalCode = "45221",
-                State = "OH"
+                State = "OH"*/
             };
         }
 
@@ -57,6 +63,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
             public string Summary { get; set; }
             public string Details { get; set; }
             public int NumberOfParticipantsRequested { get; set; }
+            public string Location { get; set; }
             public string Address1 { get; set; }
             public string Address2 { get; set; }
             public string City { get; set; }

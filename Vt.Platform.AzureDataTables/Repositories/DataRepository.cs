@@ -37,6 +37,16 @@ namespace Vt.Platform.AzureDataTables.Repositories
         private void MapEventTableToEventDto(EventTable table, EventDto dto)
         {
             // TODO: MAP EVENT TABLE OBJECT TO THE EVENT DTO OBJECT
+            dto.ConfirmationCode = table.ConfirmationCode;
+            dto.EventDate = table.EventDate;
+            dto.EventDetails = table.EventDetails;
+            dto.EventLocation = table.EventLocation;
+            dto.EventSummary = table.EventSummary;
+            dto.NumberOfParticipants = table.NumberOfParticipants.GetValueOrDefault();
+            dto.OrganizerCode = table.OrganizerCode;
+            dto.OrganizerEmail = table.OrganizerEmail;
+            dto.OrganizerName = table.OrganizerName;
+            dto.OrganizerValidated = table.OrganizerValidated;
         }
 
         private void MapParticipantDtoToParticipantTable(ParticipantDto dto, ParticipantTable table)

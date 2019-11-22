@@ -1,0 +1,5 @@
+﻿body {
+}
+@media (max-width: 600px) {
+    div {align-content:center; background-color:aqua; align-items:center;}
+}
