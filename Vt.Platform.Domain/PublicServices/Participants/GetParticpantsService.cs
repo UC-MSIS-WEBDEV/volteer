@@ -6,19 +6,31 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Vt.Platform.Domain.Enums;
 using Vt.Platform.Domain.Models.Api;
+using Vt.Platform.Domain.Models.Persistence;
+using Vt.Platform.Domain.Repositories;
 using Vt.Platform.Utils;
 
 namespace Vt.Platform.Domain.PublicServices.Participants
 {
     public class GetParticipantsService : BaseService<GetParticipantsService.Request, GetParticipantsService.Response>
     {
-        public GetParticipantsService(ILogger logger) : base(logger)
+        private IDataRepository _dataRepository;
+        public GetParticipantsService(IDataRepository dataRepository, ILogger logger) : base(logger)
         {
+            _dataRepository = dataRepository;
         }
 
         protected override async Task<Response> Implementation(Request request)
         {
             await Task.CompletedTask;
+
+            /*string eventCode = request.EventCode;
+
+            ParticipantDto[] participants = await _dataRepository.GetParticipantsAsync(eventCode);
+            var response = new Response();
+            response.EventCode = request.EventCode;
+            response.Participants = participants;
+            return response;*/
             return new Response
             {
                 EventCode = request.EventCode,

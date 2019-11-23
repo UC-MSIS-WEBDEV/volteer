@@ -1,0 +1,192 @@
+﻿@page
+@model Vt.Platform.Web.Pages.events.displayModel
+@{
+    ViewData["Title"] = "Event";
+}
+
+    <div id="app">
+        <div class="d-none d-md-block">
+            <div v-if="isEventExpired">
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> This event is not valid or has expired. Please check your event code and try again.
+                </div>
+            </div>
+            <div v-else class="row">
+                <div class="col-sm-5">
+                    <h4>Organizer</h4>
+                    <h6>{{ organizerName }}</h6>
+                    </br>
+                    <h4>Event</h4>
+                    <h6>{{ eventSummary }}</h6>
+                    </br>
+                    <h4>Event Details</h4>
+                    <h6>{{ eventDetails }}</h6>
+                    </br>
+                    <h4>Location</h4>
+                    <h6>{{ address1 }}</h6>
+                </div>
+                <div class="col-sm-5">
+                    <div>
+                        <h4>Who's Coming</h4>
+                        <button type="button" data-toggle="modal" data-target="#formModal" class="btn btn-primary">I can come</button>
+                        <button type="button" data-toggle="modal" data-target="#formModal" class="btn btn-primary">maybe</button>
+                        <button type="button" data-toggle="modal" data-target="#formModal" class="btn btn-primary">can't come</button>
+                    </div>&nbsp
+                    <div style="height:200px;overflow-y:auto">
+                        <table>
+                            <tbody>
+                                <tr v-for="participant in participants">
+                                    <td>{{ participant.name }}</td>
+                                    <td>{{ participant.status.name }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-md-none">
+            <div v-if="isEventExpired">
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> This event is not valid or has expired. Please check your event code and try again.
+                </div>
+            </div>
+            <div v-else>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-event-tab" data-toggle="tab" href="#nav-event" role="tab" aria-controls="nav-event" aria-selected="true">Event</a>
+                        <a class="nav-item nav-link" id="nav-coming-tab" data-toggle="tab" href="#nav-coming" role="tab" aria-controls="nav-coming" aria-selected="false">Who's Coming</a>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-event" role="tabpanel" aria-labelledby="nav-event-tab">
+                        </br>
+                        <h4>Organizer</h4>
+                        <h6>{{ organizerName }}</h6>
+                        </br>
+                        <h4>Event</h4>
+                        <h6>{{ eventSummary }}</h6>
+                        </br>
+                        <h4>Event Details</h4>
+                        <h6>{{ eventDetails }}</h6>
+                        </br>
+                        <h4>Location</h4>
+                        <h6>{{ address1 }}</h6>
+                    </div>
+                    <div class="tab-pane fade" id="nav-coming" role="tabpanel" aria-labelledby="nav-coming-tab">
+                        </br>
+                        <div>
+                            <h4>Who's Coming</h4>
+                            <button type="button" data-toggle="modal" data-target="#formModal" class="btn btn-primary">I can come</button>
+                            <button type="button" data-toggle="modal" data-target="#formModal" class="btn btn-primary">maybe</button>
+                            <button type="button" data-toggle="modal" data-target="#formModal" class="btn btn-primary">can't come</button>
+                        </div>&nbsp
+                        <div style="height:200px;overflow-y:auto">
+                            <table>
+                                <tbody>
+                                    <tr v-for="participant in participants">
+                                        <td>{{ participant.name }}</td>
+                                        <td>{{ participant.status.name }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Your Information</h5>
+                    </div>
+                    <form>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="participant-name" class="col-form-label"><strong>Your Name</strong></label>
+                                <p>This is displayed on the event page</p>
+                                <input type="text" class="form-control" placeholder="John S." id="participant-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="col-form-label"><strong>Your Email</strong></label>
+                                <p>This is never displayed. Only used to send important notifications</p>
+                                <input type="text" class="form-control" placeholder="john.smith@example.com" id="email">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" v-on:click="saveParticipant()" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section scripts{
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                // PLACE DATA PROPERTIES HERE - THIS IS THE "MODEL" FOR OUR PROGRAM
+                organizerName: "",
+                eventDateTime: "",
+                eventSummary: "",
+                eventDetails: "",
+                numberOfParticipantsRequested: "",
+                address1: "",
+                address2: "",
+                city: "",
+                state: "",
+                postalCode: "",
+                latitude: "",
+                longitude: "",
+                participants: [],
+                isEventExpired: false
+            },
+            mounted: function () {
+                var self = this;
+                // PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
+                $.get('http://localhost:7071/api/GetEvent?eventcode=ET9PE8', function (indata) {
+                    self.organizerName = indata.organizerName;
+                    self.eventDateTime = indata.eventDate;
+                    self.eventSummary = indata.summary;
+                    self.eventDetails = indata.details;
+                    self.numberOfParticipantsRequested = indata.numberOfParticipantsRequested;
+                    self.address1 = indata.address1;
+                    /*self.address2 = indata.address2;
+                    self.city = indata.city;
+                    self.state = indata.state;
+                    self.postalCode = indata.postalCode;
+                    self.latitude = indata.latitude;
+                    self.longitude = indata.longitude;*/
+                    eventDate = new Date(indata.eventDate);
+                    console.log(eventDate);
+                    todayDate = new Date();
+                    console.log(todayDate);
+                    difference = todayDate - eventDate;
+                    console.log(difference);
+                    self.isEventExpired = difference > 0;
+                    console.log(self.isEventExpired);
+
+                })
+
+                $.get('https://volteer-sandbox-api.azurewebsites.net/api/GetParticipants?eventCode=abc123 ', function (indata) {
+                    self.participants = indata.participants;
+                })
+            },
+            methods: {
+                // ADD ANY METHODS (CLICK, SUBMIT EVENTS, ETC.)
+                saveParticipant: function () {
+                    console.log("About to save participant");
+                }
+            },
+            computed: {
+                // CREATE ANY CALCULATED PROPERTIES HERE. THEY BEHAVE LIKE READ-ONLY DATA
+            }
+        });
+    </script>
+
+}
+

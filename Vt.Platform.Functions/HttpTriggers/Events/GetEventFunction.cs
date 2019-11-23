@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Tokenize.Client;
 using Vt.Platform.Domain.PublicServices.Events;
 using Vt.Platform.Domain.PublicServices.System;
+using Vt.Platform.Domain.Repositories;
 using Vt.Platform.Utils;
 
 namespace Vt.Platform.Functions.HttpTriggers.Events
@@ -17,11 +18,14 @@ namespace Vt.Platform.Functions.HttpTriggers.Events
     {
         private readonly ILogger<GetEventFunction> _logger;
         private readonly IObjectTokenizer _objectTokenizer;
+        private readonly IDataRepository _dataRepository;
 
         public GetEventFunction(
+            IDataRepository dataRepository,
             ILogger<GetEventFunction> logger,
             IObjectTokenizer objectTokenizer)
         {
+            _dataRepository = dataRepository;
             _logger = logger;
             _objectTokenizer = objectTokenizer;
         }
@@ -31,7 +35,7 @@ namespace Vt.Platform.Functions.HttpTriggers.Events
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
         {
             var response = await req.CallService(
-                () => new GetEventService(_logger),
+                () => new GetEventService(_dataRepository, _logger),
                 _objectTokenizer,
                 HttpMethod.Get,
                 HttpMethod.Post);

@@ -8,20 +8,20 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Tokenize.Client;
 using Vt.Platform.Domain.PublicServices.Events;
-using Vt.Platform.Domain.PublicServices.Participants;
+using Vt.Platform.Domain.PublicServices.System;
 using Vt.Platform.Domain.Repositories;
-using Vt.Platform.Functions.HttpTriggers.Events;
 using Vt.Platform.Utils;
 
-namespace Vt.Platform.Functions.HttpTriggers.Participants
+namespace Vt.Platform.Functions.HttpTriggers.Events
 {
-    public class GetParticipantsFunction
+    public class ConfirmEventFunction
     {
-        private readonly IDataRepository _dataRepository;
+
         private readonly ILogger<GetEventFunction> _logger;
         private readonly IObjectTokenizer _objectTokenizer;
+        private readonly IDataRepository _dataRepository;
 
-        public GetParticipantsFunction(
+        public ConfirmEventFunction(
             IDataRepository dataRepository,
             ILogger<GetEventFunction> logger,
             IObjectTokenizer objectTokenizer)
@@ -30,13 +30,12 @@ namespace Vt.Platform.Functions.HttpTriggers.Participants
             _logger = logger;
             _objectTokenizer = objectTokenizer;
         }
-
-        [FunctionName("GetParticipants")]
+        [FunctionName("ConfirmEvent")]
         public async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
+           [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
         {
             var response = await req.CallService(
-                () => new GetParticipantsService(_dataRepository, _logger),
+                () => new ConfirmEventService(_dataRepository, _logger),
                 _objectTokenizer,
                 HttpMethod.Get,
                 HttpMethod.Post);

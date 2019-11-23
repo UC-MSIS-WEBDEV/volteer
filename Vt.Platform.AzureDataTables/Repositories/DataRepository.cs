@@ -13,14 +13,37 @@ namespace Vt.Platform.AzureDataTables.Repositories
     public class DataRepository : RepositoryBase, IDataRepository
     {
 
+
         private void MapEventDtoToEventTable(EventDto dto, EventTable table)
         {
             // TODO: MAP EVENT DTO OBJECT TO THE EVENT TABLE OBJECT
+            table.ConfirmationCode = dto.ConfirmationCode;
+            table.EventDate = dto.EventDate;
+            table.EventDetails = dto.EventDetails;
+            table.EventLocation = dto.EventLocation;
+            table.EventSummary = dto.EventSummary;
+            table.NumberOfParticipants = dto.NumberOfParticipants;
+            table.OrganizerCode = dto.OrganizerCode;
+            table.OrganizerEmail = dto.OrganizerEmail;
+            table.OrganizerName = dto.OrganizerName;
+            table.OrganizerValidated = dto.OrganizerValidated;
+
+            table.Created = DateTime.UtcNow;
+            table.Modified = DateTime.UtcNow;
+            table.CreatedBy = "System";
+            table.ModifiedBy = "System";
         }
 
         private void MapEventTableToEventDto(EventTable table, EventDto dto)
         {
-            // TODO: MAP EVENT TABLE OBJECT TO THE EVENT DTO OBJECT
+            //Mapping event table object to event dto object
+            dto.OrganizerName = table.OrganizerName;
+            dto.EventDate = table.EventDate;
+            dto.EventSummary = table.EventSummary;
+            dto.EventDetails = table.EventDetails;
+            dto.EventLocation = table.EventLocation;
+            dto.NumberOfParticipants = table.NumberOfParticipants;
+
         }
 
         private void MapParticipantDtoToParticipantTable(ParticipantDto dto, ParticipantTable table)
@@ -38,7 +61,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
         public async Task<EventDto> GetEventAsync(string volteerEventCode)
         {
             var table = await GetTable("EventData");
-            var result = await table.GetEntity<EventTable>(volteerEventCode, "Event");
+            var result = await table.GetEntity<EventTable>("Event", volteerEventCode);
             if (result == null)
             {
                 return null;
@@ -46,7 +69,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
             var dto = new EventDto
             {
-                EventCode = result.PartitionKey,
+                EventCode = result.RowKey,
             };
 
             MapEventTableToEventDto(result, dto);
@@ -112,18 +135,42 @@ namespace Vt.Platform.AzureDataTables.Repositories
             var existingEntry = await GetEventAsync(volteerEvent.EventCode);
 
             var etag = existingEntry == null ? null : "*";
-
-            var eventTable = new EventTable
+            if (etag == null)
             {
-                RowKey = volteerEvent.EventCode,
-                PartitionKey = "Event",
-                ETag = etag
-            };
+                var eventTable = new EventTable
+                {
+                    RowKey = volteerEvent.EventCode,
+                    PartitionKey = "Event",
+                    ETag = etag
+                };
 
-            MapEventDtoToEventTable(volteerEvent, eventTable);
+                MapEventDtoToEventTable(volteerEvent, eventTable);
 
-            var insertOperation = TableOperation.InsertOrReplace(eventTable);
-            await table.ExecuteAsync(insertOperation);
+                var insertOperation = TableOperation.InsertOrReplace(eventTable);
+                await table.ExecuteAsync(insertOperation);
+            }
+            if (etag == "*")
+            {
+                TableOperation retrieve = TableOperation.Retrieve<EventTable>("Event", volteerEvent.EventCode);
+
+                TableResult result = await table.ExecuteAsync(retrieve);
+
+                EventTable e = (EventTable)result.Result;
+
+                e.ETag = "*";
+                if(e.ConfirmationCode == volteerEvent.ConfirmationCode)
+                {
+                    e.OrganizerValidated = true;
+                }
+                if (result != null)
+                {
+                    TableOperation update = TableOperation.Replace(e);
+
+                    await table.ExecuteAsync(update);
+                }
+
+
+            }
         }
 
         public async Task SaveOrUpdateParticipantAsync(ParticipantDto participant)

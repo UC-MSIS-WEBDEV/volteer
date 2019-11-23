@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A0EAD991
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{77A09C35-FEB6-4517-BF51-3BE3F2ACE6FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vt.Platform.Web", "Vt.Platform.Web\Vt.Platform.Web.csproj", "{7A649717-978F-4895-82E6-BCB382A49E6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vt.Platform.Web", "Vt.Platform.Web\Vt.Platform.Web.csproj", "{7A649717-978F-4895-82E6-BCB382A49E6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
