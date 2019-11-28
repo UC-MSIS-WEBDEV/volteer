@@ -39,7 +39,8 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
             return new Response
             {
-                statusCode = "ok"
+                eventCode = eventCode,
+                isValidated = "true"
             };
 
         }
@@ -64,7 +65,9 @@ namespace Vt.Platform.Domain.PublicServices.Events
         public class Response : BaseResponse
         {
             // RESPONSE DATA MODEL GOES HERE
-            public string statusCode { get; set; }
+            public string eventCode { get; set; }
+
+            public string isValidated { get; set; }
         }
     }
 }

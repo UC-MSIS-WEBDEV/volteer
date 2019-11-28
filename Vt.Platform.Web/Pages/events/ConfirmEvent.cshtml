@@ -1,0 +1,82 @@
+﻿@page
+@model Vt.Platform.Web.Pages.events.ConfirmEventModel
+@{
+    ViewData["Title"] = "ConfirmEvent";
+}
+
+<h1 style="text-align:center">Event Confirmation Details</h1>
+<div id="confirmEvent">
+    <div v-if="isEventInValid">
+        <div style="text-align:center" class="alert alert-warning">
+            <h4>Warning!</h4>
+            <p>The event you are confirming is not valid or has expired. Please check your event and try again.</p>
+        </div>
+    </div>
+    <div v-else>
+        <div style="text-align:center">
+            <h4>The event <strong> {{eventName}} </strong>has been confirmed!!</h4>
+            <p>
+                You can now share the event link with your contacts
+                <a href="https://volteer.us/events/{{ form.EventCode}}">https://volteer.us/events/{{ form.EventCode}}</a>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/vue-router"></script>
+
+@section scripts{
+    <script>
+        var router = new VueRouter({
+            mode: 'history',
+            routes: []
+        });
+        var app = new Vue({
+            router,
+            el: "#confirmEvent",
+            data: {
+                // PLACE DATA PROPERTIES HERE - THIS IS THE "MODEL" FOR OUR PROGRAM
+                form: {
+                    EventCode: "",
+                    ConfirmationCode:""
+                },
+                eventName:"",
+                isEventInValid: false
+            },
+            mounted: function () {
+                var self = this;
+                var eventCode = self.$route.query.event;
+                self.form.EventCode = eventCode;
+                var confirmationCode = self.$route.query.confirm;
+                self.form.ConfirmationCode = confirmationCode;
+                //PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
+                $.get('http://localhost:7071/api/GetEvent?eventcode=' + eventCode, function (indata) {
+                    eventDate = new Date(indata.eventDate);
+                    todayDate = new Date();
+                    difference = todayDate - eventDate;
+                    if (confirmationCode == indata.confirmationCode && difference <= 0) {
+                        self.eventName = indata.summary;
+                        self.SetValidateForEvent(self);
+                    }
+                    else {
+                        self.isEventInValid = true;
+                    }
+                })
+            },
+            methods: {
+                SetValidateForEvent: function (self) {
+                    $.post('http://localhost:7071/api/ConfirmEvent', JSON.stringify(self.form), function (res) {
+                        var isEventValid = res.isValidated;
+                        console.log(isEventValid);
+                        if (isEventValid != "true") {
+                            self.isEventInValid = true;
+                        }
+                    })
+                }
+            },
+            computed: {
+                // CREATE ANY CALCULATED PROPERTIES HERE. THEY BEHAVE LIKE READ-ONLY DATA
+            }
+        });
+    </script>
+
+}

@@ -43,6 +43,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
             dto.EventDetails = table.EventDetails;
             dto.EventLocation = table.EventLocation;
             dto.NumberOfParticipants = table.NumberOfParticipants;
+            dto.ConfirmationCode = table.ConfirmationCode;
 
         }
 

@@ -37,7 +37,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
             response.City = dto.EventLocation;
             response.State = dto.EventLocation;
             response.PostalCode = dto.EventLocation;
-
+            response.ConfirmationCode = dto.ConfirmationCode;
 
             return response;
         }
@@ -69,6 +69,8 @@ namespace Vt.Platform.Domain.PublicServices.Events
             public string PostalCode { get; set; }
             public double? Latitude { get; set; }
             public double? Longitude { get; set; }
+            public string ConfirmationCode { get; set; }
+
         }
 
     }
