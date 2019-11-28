@@ -16,11 +16,38 @@ namespace Vt.Platform.AzureDataTables.Repositories
         private void MapEventDtoToEventTable(EventDto dto, EventTable table)
         {
             // TODO: MAP EVENT DTO OBJECT TO THE EVENT TABLE OBJECT
+
+            // TODO: MAP EVENT DTO OBJECT TO THE EVENT TABLE OBJECT
+            table.ConfirmationCode = dto.ConfirmationCode;
+            table.EventDate = dto.EventDate;
+            table.EventDetails = dto.EventDetails;
+            table.EventLocation = dto.EventLocation;
+            table.EventSummary = dto.EventSummary;
+            table.NumberOfParticipants = dto.NumberOfParticipants;
+            table.OrganizerCode = dto.OrganizerCode;
+            table.OrganizerEmail = dto.OrganizerEmail;
+            table.OrganizerName = dto.OrganizerName;
+            table.OrganizerValidated = dto.OrganizerValidated;
+
+            table.Created = DateTime.UtcNow;
+            table.Modified = DateTime.UtcNow;
+            table.CreatedBy = "System";
+            table.ModifiedBy = "System";
         }
 
         private void MapEventTableToEventDto(EventTable table, EventDto dto)
         {
             // TODO: MAP EVENT TABLE OBJECT TO THE EVENT DTO OBJECT
+            dto.ConfirmationCode = table.ConfirmationCode;
+            dto.EventDate = table.EventDate;
+            dto.EventDetails = table.EventDetails;
+            dto.EventLocation = table.EventLocation;
+            dto.EventSummary = table.EventSummary;
+            dto.NumberOfParticipants = table.NumberOfParticipants.Value;
+            dto.OrganizerCode = table.OrganizerCode;
+            dto.OrganizerEmail = table.OrganizerEmail;
+            dto.OrganizerName = table.OrganizerName;
+            dto.OrganizerValidated = table.OrganizerValidated;
         }
 
         private void MapParticipantDtoToParticipantTable(ParticipantDto dto, ParticipantTable table)
@@ -38,7 +65,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
         public async Task<EventDto> GetEventAsync(string volteerEventCode)
         {
             var table = await GetTable("EventData");
-            var result = await table.GetEntity<EventTable>(volteerEventCode, "Event");
+            var result = await table.GetEntity<EventTable>("Event", volteerEventCode);
             if (result == null)
             {
                 return null;
@@ -47,6 +74,16 @@ namespace Vt.Platform.AzureDataTables.Repositories
             var dto = new EventDto
             {
                 EventCode = result.PartitionKey,
+                ConfirmationCode = result.ConfirmationCode,
+                EventDate = result.EventDate,
+                EventDetails = result.EventDetails,
+                EventLocation = result.EventLocation,
+                EventSummary = result.EventSummary,
+                NumberOfParticipants = result.NumberOfParticipants.Value,
+                OrganizerCode = result.OrganizerCode,
+                OrganizerEmail = result.OrganizerEmail,
+                OrganizerName = result.OrganizerName,
+                OrganizerValidated = result.OrganizerValidated
             };
 
             MapEventTableToEventDto(result, dto);
@@ -113,13 +150,26 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
             var etag = existingEntry == null ? null : "*";
 
-            var eventTable = new EventTable
+            var eventTable = new EventTable();
+            if (etag == null)
             {
-                RowKey = volteerEvent.EventCode,
-                PartitionKey = "Event",
-                ETag = etag
-            };
-
+                eventTable.RowKey = volteerEvent.EventCode;
+                eventTable.PartitionKey = "Event";
+                eventTable.ETag = etag;
+            }
+            else
+            {
+                eventTable.RowKey = volteerEvent.EventCode;
+                eventTable.PartitionKey = "Event";
+                eventTable.ETag = etag;
+                volteerEvent.OrganizerEmail = existingEntry.OrganizerEmail;
+                volteerEvent.OrganizerName = existingEntry.OrganizerName;
+                volteerEvent.EventDate = existingEntry.EventDate;
+                volteerEvent.EventDetails = existingEntry.EventDetails;
+                volteerEvent.EventSummary = existingEntry.EventSummary;
+                volteerEvent.EventLocation = existingEntry.EventLocation;
+            }
+            
             MapEventDtoToEventTable(volteerEvent, eventTable);
 
             var insertOperation = TableOperation.InsertOrReplace(eventTable);

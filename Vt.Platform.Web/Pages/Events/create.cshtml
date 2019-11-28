@@ -1,0 +1,167 @@
+﻿@page
+@model Vt.Platform.Web.Pages.Events.createModel
+@{
+    ViewData["Title"] = "create";
+}
+
+<style>
+    body {
+        background-color: #f2f2f2;
+    }
+</style>
+<style>
+    .fontStyle {
+        font-family: Georgia;
+        font-size: 20px;
+    }
+</style>
+<h1 style="font-family:Comic Sans MS;">volteer.us</h1>
+<hr />
+
+<div id="app">
+    <div class="container" align="center">
+        <div v-if="showToast" class="card" style="width:100%;height:5rem;background-color:lightgreen">
+            <div class="card-body">
+                <p><strong>Success! </strong> Your event has been created with code {{ eventCodeGenerated }}</p>
+            </div>
+        </div>
+    </div>
+
+    <p v-show="isInvalidForm" style="color:red" class="fontStyle">{{ errorString }}</p>
+    <form class="form" v-on:submit.stop.prevent="createEvent">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="name" class="fontStyle">Organizer Name</label>
+                    <input type="text" class="form-control" id="name" placeholder="Name" v-model="form.OrganizerName" required />
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="summary" class="fontStyle">Event Summary</label>
+                    <input type="text" class="form-control" id="summary" placeholder="EventSummary" v-model="form.EventSummary" required />
+                    <p v-if="form.EventSummary.length > 140"><strong style="color:red">Summary cannot be greater than 140 characters</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="email" class="fontStyle">Organizer Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Email" v-model="form.OrganizerEmail" required />
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="details" class="fontStyle">Event Details</label>
+                    <textarea rows="4" cols="50" name="details" class="form-control" id="EventDetails" placeholder="Enter details of the event here.." v-model="form.EventDetails"></textarea>
+                    <p v-if="form.EventDetails.length > 750"><strong style="color:red">Deatils cannot exceed 750 characters</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="eventDate" class="fontStyle">Event Date</label>
+                    <input type="date" class="form-control" id="eventDate" placeholder="" v-model="form.EventDate" required />
+                    <p v-if="invalidDate"><strong style="color:red">Event date cannot be past date or out of 90 days</strong></p>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="location" class="fontStyle">Location</label>
+                    <input type="text" class="form-control" id="location" placeholder="" v-model="form.EventLocation" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="numberOfParticipants" class="fontStyle">Number of Participants</label>
+                    <input type="number" class="form-control" id="numberOfParticipants" placeholder="" v-model="form.NumberOfParticipants" required />
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Create Event</button>
+        </div>
+        <br />
+    </form>
+    <div>
+        <div class="card-header">
+            <h5>Response JSON String</h5>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ eventJSONstring }}</p>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                eventJSONstring: "Response JSON appers here",
+                errorString: "",
+                response: "",
+                isInvalidForm: false,
+                showToast: false,
+                difference: 0,
+                eventCodeGenerated: "",
+                form: {
+                    OrganizerName: "",
+                    EventSummary: "",
+                    OrganizerEmail: "",
+                    EventDetails: "",
+                    EventDate: "",
+                    EventLocation: "",
+                    NumberOfParticipants: 0
+                }
+            },
+            mounted: function () {
+
+            },
+            methods: {
+                createEvent: function () {
+                    var self = this;
+                    if (self.form.EventSummary.length > 140 || self.form.EventDetails.length > 750 || self.difference > 90 || self.difference < 0) {
+                        self.isInvalidForm = true;
+                        self.errorString = "Please review below errors";
+                    } else {
+                        $.post('http://localhost:7071/api/CreateEvent', JSON.stringify(self.form), function (res) {
+                            self.response = JSON.stringify(res);
+                            self.eventJSONstring = self.response;
+                            self.eventCodeGenerated = res.eventCode;
+                            console.log('res-->' + self.response);
+                            console.log('res1-->' + res);
+                            self.showToast = true;
+                            vm.$forceUpdate();
+                        })
+                        self.isInvalidForm = false;
+                        self.form.OrganizerName = "";
+                        self.form.EventSummary = "";
+                        self.form.OrganizerEmail = "";
+                        self.form.EventDetails = "";
+                        self.form.EventDate = "";
+                        self.form.EventLocation = "";
+                        self.form.NumberOfParticipants = "";
+                    }
+
+                }
+            },
+            computed: {
+                invalidDate: function () {
+                    var self = this;
+                    eventDateCheck = new Date(self.form.EventDate);
+                    todayDate = new Date();
+                    self.difference = (eventDateCheck - todayDate) / 86400000;
+                    return self.difference > 90 || self.difference < 0;
+                }
+            }
+        });
+    </script>
+}
+

@@ -1,0 +1,248 @@
+﻿@page
+@model Vt.Platform.Web.Pages.Events.displayModel
+@{
+    ViewData["Title"] = "display";
+}
+
+
+<style>
+    body {
+        background-color: #f2f2f2;
+    }
+</style>
+
+
+<h1 style="font-family:Comic Sans MS;">volteer.us</h1>
+
+<div id="app">
+    <div class="d-none d-md-block">
+        <div class="row">
+            <div class="col-sm-4">
+                <form v-on:submit.stop.prevent="getEvent">
+                    <div class="form-group">
+                        <label for="code" style="font-size:23px;">Event Code</label>
+                        <input type="text" class="form-control" id="code" placeholder="" v-model="code" />
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Get Event Details</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="spinner-border" role="status" v-if="isLoading">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <br />
+        <div v-if="eventExpired">
+            <p style="font-family:Georgia; font-size:25px;">This event is not valid or has expired. Please check your event code and try again.</p>
+        </div>
+        <div v-else>
+            <div class="row" v-if="showEvent">
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title" align="center" style="font-family:Georgia; font-size:30px;">{{ eventName }}</h5>
+                            <h6 style="font-family:Georgia; font-size:25px;">Organizer</h6>
+                            <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ organizerName }}</p>
+                            <h6 style="font-family:Georgia; font-size:25px;">Details</h6>
+                            <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ eventDetails }}</p>
+                            <h6 style="font-family:Georgia; font-size:25px;">Location</h6>
+                            <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ eventLocation }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title" align="center">Who's Coming?</h5>
+                            <div class="btn-group btn-group-justified" align="center">
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px">I can come</button>
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px">maybe</button>
+                                <button class="btn btn-primary" style="width:160px">can't come</button>
+                            </div>
+                            <br />
+                            <br />
+                            <h4 style="font-family:Times New Roman;">List of Participants</h4>
+                            <div style="height:300px; overflow-y:auto;">
+                                <table class="table table-striped">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="list in eventParticipants">
+                                            <td>{{ list.name }}</td>
+                                            <td v-if="list.status == 'Confirmed'"><span class="badge badge-pill badge-success">Yes</span></td>
+                                            <td v-else><span class="badge badge-pill badge-warning">maybe</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="d-md-none">
+        <div class="row">
+            <div class="col-sm-4">
+                <form v-on:submit.stop.prevent="getEvent">
+                    <div class="form-group">
+                        <label for="code" style="font-size:23px;">Event Code</label>
+                        <input type="text" class="form-control" id="code" placeholder="" v-model="code" />
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Get Event Details</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <br />
+        <div v-if="eventExpired">
+            <p style="font-family:Georgia; font-size:25px;">This event is not valid or has expired. Please check your event code and try again.</p>
+        </div>
+        <div v-else>
+            <div v-if="showEvent">
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-event-tab" data-toggle="tab" href="#nav-eventDetails" role="tab" aria-controls="nav-eventDetails" aria-selected="true">Event Details</a>
+                        <a class="nav-item nav-link" id="nav-coming-tab" data-toggle="tab" href="#nav-partsDetails" role="tab" aria-controls="nav-partsDetails" aria-selected="false">Who's Coming?</a>
+                    </div>
+                </nav>
+                <br />
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-eventDetails" role="tabpanel" aria-labelledby="nav-event-tab">
+                        <h5 align="center" style="font-family:Georgia; font-size:30px;">{{ eventName }}</h5>
+                        <h6 style="font-family:Georgia; font-size:25px;">Organizer</h6>
+                        <p style="font-family:Lucida Console; font-size:18px;">{{ organizerName }}</p>
+                        <h6 style="font-family:Georgia; font-size:25px;">Details</h6>
+                        <p style="font-family:Lucida Console; font-size:18px;">{{ eventDetails }}</p>
+                        <h6 style="font-family:Georgia; font-size:25px;">Location</h6>
+                        <p style="font-family:Lucida Console; font-size:18px;">{{ eventLocation }}</p>
+                    </div>
+                    <div class="tab-pane fade" id="nav-partsDetails" role="tabpanel" aria-labelledby="nav-coming-tab">
+                        <div>
+                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">I can come</button>
+                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">maybe</button>
+                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">can't come</button>
+                        </div>&nbsp
+                        <div style="height:300px; overflow-y:auto;">
+                            <table class="table table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="list in eventParticipants">
+                                        <td>{{ list.name }}</td>
+                                        <td v-if="list.status == 'Confirmed'"><span class="badge badge-pill badge-success">Yes</span></td>
+                                        <td v-else><span class="badge badge-pill badge-warning">maybe</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="getModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Please provide your information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="participantForm" v-on:submit.stop.prevent="createEvent">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="participantName" class="fontStyle">Name</label>
+                            <input type="text" class="form-control" id="participantName" placeholder="Participant Name" v-model="participantForm.ParticipantName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="participantEmail" class="fontStyle">Email</label>
+                            <input type="email" class="form-control" id="participantEmail" placeholder="Participant Email" v-model="participantForm.ParticipantEmail" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                showEvent: false,
+                isLoading: false,
+                eventExpired: false,
+                organizerName: "",
+                eventName: "",
+                eventDetails: "",
+                eventLocation: "",
+                mapURL: "",
+                code: "",
+                eventParticipants: [],
+                participantForm: {
+                    ParticipantName: "",
+                    ParticipantEmail: ""
+                }
+            },
+            methods: {
+                getEvent: function () {
+                    var self = this;
+                    self.isLoading = true;
+                    $.get('http://localhost:7071/api/GetEvent?eventcode=' + self.code, function (event) {
+                        console.log('error-->' + event.metaData.success);
+                        if (event.metaData.success == true) {
+                            self.organizerName = event.organizerName;
+                            self.eventName = event.summary;
+                            self.eventDetails = event.details;
+                            self.eventLocation = "lat: " + event.latitude + "  long: " + event.longitude;
+                            var marker = event.latitude + "," + event.longitude;
+                            self.mapURL = 'https://maps.googleapis.com/maps/api/staticmap?center=' + marker + '&zoom=7&size=600x300&&markers=color:blue%7Clabel:S%7C' + marker + '&maptype=roadmap&key=AIzaSyD-nDTkONjEqgy2FiOUjUKRWtrxHdi3Jmc';
+                            eventDateCheck = new Date(event.eventdate);
+                            todayDate = new Date();
+                            difference = todayDate - eventDateCheck;
+                            self.isLoading = false;
+                            self.showEvent = true;
+                            if (difference > 0) {
+                                self.eventExpired = true;
+                            }
+                        } else {
+                            self.eventExpired = true;
+                        }
+
+                    })
+                    $.get(' https://volteer-sandbox-api.azurewebsites.net/api/GetParticipants?eventCode=' + self.code, function (data) {
+                        var participantsList = data.participants;
+                        for (var i = 0; i < participantsList.length; i++) {
+                            self.eventParticipants.push({ name: participantsList[i].name, status: participantsList[i].status.name });
+                        }
+                    })
+
+                }
+
+            }
+        })
+    </script>
+}
+
