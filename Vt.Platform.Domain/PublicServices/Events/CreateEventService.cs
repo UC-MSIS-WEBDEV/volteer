@@ -9,6 +9,7 @@ using Vt.Platform.Domain.Services;
 using System.ComponentModel.DataAnnotations;
 using Vt.Platform.Utils;
 using Vt.Platform.Domain.Models.Persistence;
+using System.Net.Mail;
 
 namespace Vt.Platform.Domain.PublicServices.Events
 {
@@ -16,14 +17,17 @@ namespace Vt.Platform.Domain.PublicServices.Events
     {
         private IDataRepository _dataRepository;
         private IRandomGenerator _randomGenerator;
+        private IEmailService _emailservice;
         public CreateEventService(
           IDataRepository dataRepository,
           IRandomGenerator randomGenerator,
-          ILogger logger) : base(logger)
+          ILogger logger,
+          IEmailService emailservice) : base(logger)
         {
             // CONSTRUCTOR
             _dataRepository = dataRepository;
             _randomGenerator = randomGenerator;
+            _emailservice = emailservice;
         }
 
         protected override async Task<Response> Implementation(Request request)
@@ -52,11 +56,21 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
             // SAVE IN REPOSITORY
             await _dataRepository.SaveOrUpdateEvent(dto);
-
             // CREATE RESPONSE OBJECT
             var response = new Response();
             // ASSIGN VALUES TO THE RESPONSE OBJECT
             response.EventCode = eventCode;
+            MailAddress mailAddress = new MailAddress(request.OrganizerEmail);
+            MailAddress[] mailAddresses = new MailAddress[] { mailAddress };
+            string emailBodyfl = "Your event has been created. Please do not delete this email as it contains important links you will need to confirm and to administer your event.<br/> Next Steps:";
+            string emailBodysl = "1. Confirm your Event <br/> Please click the following URL to confirm your event <br/> https://volteer.us/confirmEvent?event="+response.EventCode+"&confirm="+ confirmationCode ;
+            string emailBodytl = "2. Share your Event <br/> Use this link to share your event with your contacts <br/> https://volteer.us/events/"+response.EventCode;
+            string emailBodyfol = "3. Administer your Event <br/> *Do Not Share This Link*. The link below is just for you and allows you to administer your event. <br/> Administration Link: https://volteer.us/editEvent?event="+response.EventCode+"&adminCode="+ organizerCode;
+            string emailBodyfil = "4. Delete your Event <br/> *Do Not Share This Link*. The link below is just for you and allows you to delete your event. <br/> Delete Event Link: https://volteer.us/cancelEvent?event="+response.EventCode+"&adminCode="+ organizerCode;
+            string emailBody = emailBodyfl + emailBodysl + emailBodytl+ emailBodyfol+ emailBodyfil;
+            string emailSubject = "Volteer Event Created - Confirmation Required ";
+            //Currently hardcoding email receipient, as it only accomodates verified email.
+            await _emailservice.SendEmail(mailAddresses, emailSubject, emailBody);
 
             return response;
         }
