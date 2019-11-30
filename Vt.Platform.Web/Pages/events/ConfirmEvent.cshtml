@@ -17,7 +17,7 @@
             <h4>The event <strong> {{eventName}} </strong>has been confirmed!!</h4>
             <p>
                 You can now share the event link with your contacts
-                <a href="https://volteer.us/events/{{ form.EventCode}}">https://volteer.us/events/{{ form.EventCode}}</a>
+                <a v-bind:href="'https://volteer.us/events/'+ form.EventCode">https://volteer.us/events/{{ form.EventCode}}</a>
             </p>
         </div>
     </div>
