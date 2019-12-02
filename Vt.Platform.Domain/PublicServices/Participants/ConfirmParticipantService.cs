@@ -9,13 +9,13 @@ using System.ComponentModel.DataAnnotations;
 using Vt.Platform.Utils;
 using Vt.Platform.Domain.Models.Persistence;
 
-namespace Vt.Platform.Domain.PublicServices.Events
+namespace Vt.Platform.Domain.PublicServices.Participants
 {
-    public class ConfirmEventService : BaseService<ConfirmEventService.Request, ConfirmEventService.Response>
+    public class ConfirmParticipantService : BaseService<ConfirmParticipantService.Request, ConfirmParticipantService.Response>
     {
         private IDataRepository _dataRepository;
 
-        public ConfirmEventService(
+        public ConfirmParticipantService(
           IDataRepository dataRepository,
           ILogger logger) : base(logger)
         {
@@ -27,19 +27,20 @@ namespace Vt.Platform.Domain.PublicServices.Events
         {
             // THIS IS WHERE OUR SERVICE LOGIC WILL EXIST
             //throw new NotImplementedException();
-            var dto = new EventDto
+            var pdto = new ParticipantDto
             {
-                EventCode = request.EventCode,                
-                ConfirmationCode = request.ConfirmationCode,
-                OrganizerValidated = true
+                EventCode = request.EventCode,
+                ParticipantCode = request.ParticipantCode,
+                ParticipantValidated = true
             };
 
             // UPDATE IN REPOSITORY
-            await _dataRepository.SaveOrUpdateEvent(dto);
+            await _dataRepository.SaveOrUpdateParticipantAsync(pdto);
 
-            var response = new Response
+            var response = new Response 
             { 
-                EventCode = request.EventCode
+                EventCode = request.EventCode,
+                ParticipantCode = request.ParticipantCode
             };
             return response;
         }
@@ -59,7 +60,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
             [Required]
             public string EventCode { get; set; }
             [Required]
-            public string ConfirmationCode { get; set; }
+            public string ParticipantCode { get; set; }
         }
 
         public class Response : BaseResponse
@@ -67,10 +68,10 @@ namespace Vt.Platform.Domain.PublicServices.Events
             // RESPONSE DATA MODEL GOES HERE
             [Required]
             public string EventCode { get; set; }
-            public string OrganizerName { get; set; }
-            public string EventDetails { get; set; }
-            public string EventSummary { get; set; }
-            public bool OrganizerValidated { get; set; }
+            public string ParticipantCode { get; set; }
+            public string ParticipantName { get; set; }
+            public string ParticipantEmail { get; set; }
+            public string ParticipantStatus { get; set; }
         }
     }
 }

@@ -27,9 +27,6 @@ namespace Vt.Platform.Domain.PublicServices.Events
         {
             var dto = new EventDto();
             dto = await _dataRepository.GetEventAsync(request.EventCode);
-
-
-
             //await Task.CompletedTask;
 
             return new Response
@@ -47,7 +44,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
                 City = "Cincinnati",
                 PostalCode = "45221",
                 State = "OH"
-            };
+            };            
         }
 
         public override IDictionary<int, string> GetErrorCodes()
@@ -59,7 +56,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
         public class Request : BaseRequest
         {
             [Required]
-            public string EventCode { get; set; }
+            public string EventCode { get; set; }           
         }
 
         public class Response : BaseResponse

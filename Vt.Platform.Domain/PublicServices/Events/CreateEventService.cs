@@ -9,6 +9,7 @@ using Vt.Platform.Domain.Services;
 using System.ComponentModel.DataAnnotations;
 using Vt.Platform.Utils;
 using Vt.Platform.Domain.Models.Persistence;
+using System.Net.Mail;
 
 namespace Vt.Platform.Domain.PublicServices.Events
 {
@@ -18,15 +19,19 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
         private IRandomGenerator _randomGenerator;
 
+        private IEmailService _emailService;
+
 
         public CreateEventService(
           IDataRepository dataRepository,
           IRandomGenerator randomGenerator,
-          ILogger logger) : base(logger)
+          IEmailService emailService,
+        ILogger logger) : base(logger)
         {
             // CONSTRUCTOR
             _dataRepository = dataRepository;
             _randomGenerator = randomGenerator;
+            _emailService = emailService;
         }
 
         protected override async Task<Response> Implementation(Request request)
@@ -55,6 +60,12 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
             // SAVE IN REPOSITORY
             await _dataRepository.SaveOrUpdateEvent(dto);
+            
+            MailAddress mailAddress = new MailAddress("kajjamrr@mail.uc.edu");
+            MailAddress[] mailAddresses = new MailAddress[] { mailAddress };
+            string emailBody = "test body creating event";
+            string emailSubject = "test subject for creating event";
+            await _emailService.SendEmail(mailAddresses, emailSubject, emailBody);
 
             var response = new Response();
             // ASSIGN VALUES TO THE RESPONSE OBJECT

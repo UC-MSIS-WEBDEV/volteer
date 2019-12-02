@@ -56,8 +56,8 @@
                         <div class="card-body">
                             <h5 class="card-title" align="center">Who's Coming?</h5>
                             <div class="btn-group btn-group-justified" align="center">
-                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px">I can come</button>
-                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px">maybe</button>
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px" v-on:click="setComingStatus">I can come</button>
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px" v-on:click="setMaybeStatus">maybe</button>
                                 <button class="btn btn-primary" style="width:160px">can't come</button>
                             </div>
                             <br />
@@ -127,8 +127,8 @@
                     </div>
                     <div class="tab-pane fade" id="nav-partsDetails" role="tabpanel" aria-labelledby="nav-coming-tab">
                         <div>
-                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">I can come</button>
-                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">maybe</button>
+                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary" v-on:click="setComingStatus">I can come</button>
+                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary" v-on:click="setMaybeStatus">maybe</button>
                             <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">can't come</button>
                         </div>&nbsp
                         <div style="height:300px; overflow-y:auto;">
@@ -163,7 +163,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form class="participantForm" v-on:submit.stop.prevent="createEvent">
+                <form class="participantForm" v-on:submit.stop.prevent="createParticipant">
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="participantName" class="fontStyle">Name</label>
@@ -173,7 +173,7 @@
                             <label for="participantEmail" class="fontStyle">Email</label>
                             <input type="email" class="form-control" id="participantEmail" placeholder="Participant Email" v-model="participantForm.ParticipantEmail" required />
                         </div>
-                    </div>
+                    </div> 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save changes</button>
@@ -201,9 +201,12 @@
                 mapURL: "",
                 code: "",
                 eventParticipants: [],
+                participantResponse: "",
                 participantForm: {
+                    EventCode: "",
                     ParticipantName: "",
-                    ParticipantEmail: ""
+                    ParticipantEmail: "",
+                    ParticipantStatus: ""
                 }
             },
             methods: {
@@ -239,6 +242,27 @@
                         }
                     })
 
+                },
+                setComingStatus: function () {
+                    var self = this;
+                    self.participantForm.ParticipantStatus = "I am coming";
+                    console.log("status1-->" + self.participantForm.ParticipantStatus);
+                },
+                setMaybeStatus: function () {
+                    var self = this;
+                    self.participantForm.ParticipantStatus = "may be";
+                    console.log("status2-->" + self.participantForm.ParticipantStatus);
+                },
+                createParticipant: function () {
+                    var self = this;
+                    self.participantForm.EventCode = self.code;
+                    console.log("request-->" + JSON.stringify(self.participantForm));
+                    $.post('http://localhost:7071/api/CreateParticipant', JSON.stringify(self.participantForm), function (res) {
+                        self.participantResponse = JSON.stringify(res);
+                        console.log('res-->' + self.participantResponse);
+                        console.log('res1-->' + res);
+                        this
+                    })
                 }
 
             }

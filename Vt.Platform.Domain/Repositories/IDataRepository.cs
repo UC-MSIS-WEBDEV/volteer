@@ -19,5 +19,6 @@ namespace Vt.Platform.Domain.Repositories
 
         // NOTIFICATION REPOSITORY ACTIONS
         Task LogNotificationAsync(NotificationDto notification);
+        Task<string> GetMyEventsAsync(string email);
     }
 }

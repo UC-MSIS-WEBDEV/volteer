@@ -1,0 +1,69 @@
+﻿@page
+@model Vt.Platform.Web.Pages.Participants.ConfirmParticipantModel
+@{
+    ViewData["Title"] = "ConfirmParticipant";
+}
+
+<h1>ConfirmParticipant</h1>
+
+<h1 style="text-align:center">Participant Confirmation</h1>
+<div id="participantConfirmation">
+    <div v-if="isSuccess">
+        <div style="text-align:center">
+            <h4>Yayyyy!! Your participation has been confirmed.</h4>
+            <p>
+                You can now share the event link with your contacts
+                <a v-bind:href="'https://volteer.us/events/'+ form.EventCode">https://volteer.us/events/{{ form.EventCode }}</a>
+            </p>
+        </div>
+    </div>
+    <div v-if="isError">
+        <div style="text-align:center">
+            OOPS! There is an error in confirmimg your participation.
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/vue-router"></script>
+
+@section scripts{
+    <script>
+        var router = new VueRouter({
+            mode: 'history',
+            routes: []
+        });
+        var app = new Vue({
+            router,
+            el: "#participantConfirmation",
+            data: {
+                // PLACE DATA PROPERTIES HERE - THIS IS THE "MODEL" FOR OUR PROGRAM
+                form: {
+                    EventCode: "",
+                    ParticipantCode: ""
+                },
+                isSuccess: false,
+                isError: false
+            },
+            mounted: function () {
+                var self = this;
+                var eventCode = self.$route.query.event;
+                self.form.EventCode = eventCode;
+                var participantCode = self.$route.query.participant;
+                self.form.ParticipantCode = participantCode;
+                //PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
+                $.post('http://localhost:7071/api/ConfirmParticipant', JSON.stringify(self.form), function (res) {
+                    if (res.metaData.success == true) {
+                        isSuccess = true;
+                    }
+                    else
+                    {
+                        isError = true;
+                    }                    
+                })               
+            },
+            computed: {
+                // CREATE ANY CALCULATED PROPERTIES HERE. THEY BEHAVE LIKE READ-ONLY DATA
+            }
+        });
+    </script>
+
+}

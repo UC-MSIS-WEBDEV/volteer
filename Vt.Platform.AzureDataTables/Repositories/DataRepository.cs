@@ -53,11 +53,27 @@ namespace Vt.Platform.AzureDataTables.Repositories
         private void MapParticipantDtoToParticipantTable(ParticipantDto dto, ParticipantTable table)
         {
             // TODO: MAP PARTICIPANT DTO OBJECT TO THE PARTICIPANT TABLE OBJECT
+            table.ConfirmationCode = dto.ConfirmationCode;
+            table.ParticipantName = dto.ParticipantName;
+            table.ParticipantEmail = dto.ParticipantEmail;
+            table.ParticipantStatus = dto.ParticipantStatus;
+            table.ParticpantValidated = dto.ParticipantValidated;
+
+
+            table.Created = DateTime.UtcNow;
+            table.Modified = DateTime.UtcNow;
+            table.CreatedBy = "System";
+            table.ModifiedBy = "System";
         }
 
         private void MapParticipantTableToParticipantDto(ParticipantTable table, ParticipantDto dto)
         {
             // TODO: MAP PARTICIPANT TABLE OBJECT TO THE PARTICIPANT DTO OBJECT
+            dto.EventCode = table.PartitionKey;
+            dto.ParticipantName = table.ParticipantName;
+            dto.ParticipantEmail = table.ParticipantEmail;
+            dto.ParticipantStatus = table.ParticipantStatus;
+            dto.ParticipantValidated = table.ParticpantValidated;
         }
 
 
@@ -92,7 +108,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
         public async Task<ParticipantDto[]> GetParticipantsAsync(string volteerEventCode)
         {
-            var table = await GetTable("EventData");
+            var table = await GetTable("ParticipantData");
 
             var tq = new TableQuery<ParticipantTable>
             {
@@ -120,7 +136,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
         public async Task<ParticipantDto> GetParticipantAsync(string volteerEventCode, string participantCode)
         {
-            var table = await GetTable("EventData");
+            var table = await GetTable("ParticipantData");
             var result = await table.GetEntity<ParticipantTable>(volteerEventCode, participantCode);
             if (result == null)
             {
@@ -147,53 +163,118 @@ namespace Vt.Platform.AzureDataTables.Repositories
         {
             var table = await GetTable("EventData");
             var existingEntry = await GetEventAsync(volteerEvent.EventCode);
-
-            var etag = existingEntry == null ? null : "*";
-
-            var eventTable = new EventTable();
+            var etag = existingEntry == null ? null : "*";           
             if (etag == null)
             {
+                var eventTable = new EventTable();
                 eventTable.RowKey = volteerEvent.EventCode;
                 eventTable.PartitionKey = "Event";
                 eventTable.ETag = etag;
+
+                MapEventDtoToEventTable(volteerEvent, eventTable);
+
+                var insertOperation = TableOperation.InsertOrReplace(eventTable);
+                await table.ExecuteAsync(insertOperation);
             }
             else
             {
-                eventTable.RowKey = volteerEvent.EventCode;
-                eventTable.PartitionKey = "Event";
-                eventTable.ETag = etag;
-                volteerEvent.OrganizerEmail = existingEntry.OrganizerEmail;
-                volteerEvent.OrganizerName = existingEntry.OrganizerName;
-                volteerEvent.EventDate = existingEntry.EventDate;
-                volteerEvent.EventDetails = existingEntry.EventDetails;
-                volteerEvent.EventSummary = existingEntry.EventSummary;
-                volteerEvent.EventLocation = existingEntry.EventLocation;
-            }
-            
-            MapEventDtoToEventTable(volteerEvent, eventTable);
-
-            var insertOperation = TableOperation.InsertOrReplace(eventTable);
-            await table.ExecuteAsync(insertOperation);
+                TableOperation retrieve = TableOperation.Retrieve<EventTable>("Event", volteerEvent.EventCode);
+                TableResult result = await table.ExecuteAsync(retrieve);
+                EventTable e = (EventTable)result.Result;
+                if (e.ConfirmationCode == volteerEvent.ConfirmationCode)
+                {
+                    e.OrganizerValidated = true;
+                }
+                if (result != null)
+                {
+                    TableOperation update = TableOperation.Replace(e);
+                    await table.ExecuteAsync(update);
+                }
+            }                        
         }
 
         public async Task SaveOrUpdateParticipantAsync(ParticipantDto participant)
         {
-            var table = await GetTable("EventData");
+            var table = await GetTable("ParticipantData");
             var existingEntry = await GetParticipantAsync(participant.EventCode, participant.ParticipantCode);
-
             var etag = existingEntry == null ? null : "*";
-
-            var participantTable = new ParticipantTable
+            if (etag == null)
             {
-                RowKey = participant.EventCode,
-                PartitionKey = participant.ParticipantCode,
-                ETag = etag
+                var participantTable = new ParticipantTable
+                {
+                    RowKey = participant.ParticipantCode,
+                    PartitionKey = participant.EventCode,
+                    ETag = etag
+                };
+
+                MapParticipantDtoToParticipantTable(participant, participantTable);
+
+                var insertOperation = TableOperation.InsertOrReplace(participantTable);
+                await table.ExecuteAsync(insertOperation);
+            }
+            else
+            {
+                TableOperation retrieve = TableOperation.Retrieve<ParticipantTable>(participant.EventCode, participant.ParticipantCode);
+                TableResult result = await table.ExecuteAsync(retrieve);
+                ParticipantTable e = (ParticipantTable)result.Result;
+                if (e.RowKey == participant.ParticipantCode)
+                {
+                    e.ParticpantValidated = true; 
+                }
+                if (result != null)
+                {
+                    TableOperation update = TableOperation.Replace(e);
+                    await table.ExecuteAsync(update); 
+                }
+            }
+        }
+
+        public async Task<string> GetMyEventsAsync(string email)
+        {
+            string returningEmailBodyString = "Following are the vents you are involved in: <br> Events organized by you: <br>";
+            var eventTable = await GetTable("EventData");
+            var eventtq = new TableQuery<EventTable>
+            {
+                FilterString = TableQuery.GenerateFilterCondition("OrganizerEmail", QueryComparisons.Equal, email)
             };
+            var etResults = await eventTable.ExecuteQueryAsync(eventtq);
+            var eventResults = etResults.ToList();
 
-            MapParticipantDtoToParticipantTable(participant, participantTable);
+            var participantTable = await GetTable("ParticipantData");
+            var participanttq = new TableQuery<ParticipantTable>
+            {
+                FilterString = TableQuery.GenerateFilterCondition("ParticipantEmail", QueryComparisons.Equal, email)
+            };
+            var ptResults = await participantTable.ExecuteQueryAsync(participanttq);
+            var participantResults = ptResults.ToList();
 
-            var insertOperation = TableOperation.InsertOrReplace(participantTable);
-            await table.ExecuteAsync(insertOperation);
+            var eventdtos = new List<EventDto>();
+            var participanteventdtos = new List<EventDto>();
+
+            foreach (var item in eventResults)
+            {
+                returningEmailBodyString += "Event Name: " + item.EventDetails + "<br>" + "https://volteer.us/events/" + item.RowKey + "<br>";
+                var dto = new EventDto
+                {
+                    EventCode = item.RowKey,
+                    EventDetails = item.EventDetails,
+                };
+                MapEventTableToEventDto(item, dto);
+                eventdtos.Add(dto);
+            }
+
+            returningEmailBodyString += "Events you are participating in: <br>";
+            foreach (var item in participantResults)
+            {
+                var retrievedEvent = await GetEventAsync(item.PartitionKey);
+                if (retrievedEvent != null)
+                {
+                    returningEmailBodyString += "Event Name: " + retrievedEvent.EventDetails + "<br>" + "https://volteer.us/events/" + retrievedEvent.EventCode + "<br>";
+                    participanteventdtos.Add(retrievedEvent);
+                }
+            }
+
+            return returningEmailBodyString;
         }
     }
 }
