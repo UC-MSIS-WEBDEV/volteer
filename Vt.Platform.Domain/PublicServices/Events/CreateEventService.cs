@@ -51,7 +51,10 @@ namespace Vt.Platform.Domain.PublicServices.Events
                 NumberOfParticipants = request.NumberOfParticipants,
                 OrganizerEmail = request.OrganizerEmail,
                 OrganizerName = request.OrganizerName,
-                OrganizerValidated = false
+                OrganizerValidated = false,
+                EventLatitude=request.EventLatitude,
+                EventLongitude=request.EventLongitude
+                
             };
 
             // SAVE IN REPOSITORY
@@ -74,7 +77,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
             return response;
         }
-
+         
         public override IDictionary<int, string> GetErrorCodes()
         {
             // WE CAN DEFINE ANY CUSTOM ERROR CODES HERE
@@ -97,8 +100,12 @@ namespace Vt.Platform.Domain.PublicServices.Events
             public string EventSummary { get; set; }
             public string EventDetails { get; set; }
             public string EventLocation { get; set; }
+
             [Required]
             public int? NumberOfParticipants { get; set; }
+            public string EventLatitude { get; set; }
+            public string EventLongitude { get; set; }
+
         }
 
         public class Response : BaseResponse

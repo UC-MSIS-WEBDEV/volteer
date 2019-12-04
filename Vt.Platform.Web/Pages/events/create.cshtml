@@ -4,83 +4,85 @@
     ViewData["Title"] = "Create Event";
 }
 
-    <div id="app">
-        <form class="form" v-on:submit.stop.prevent="addEvent">
-            <h2>Volteer.us</h2>
-            </br>
-            <p style="color:red" v-if="isErrorForm">Please resolve the below error</p>
-            <div class="row">
-                <div class="col-4">
-                    <label for="organizername">Organizer Name</label>
-                    <input type="text" class="form-control" id="organizername" placeholder="" v-model="form.organizername" required>
-                </div>
-                <div class="col-1">
-                </div>
-                <div class="col-5">
-                    <label for="eventsummary">Event Summary</label>
-                    <input type="text" class="form-control" id="eventsummary" placeholder="" v-model="form.eventsummary" required>
-                    <p style="color:red" v-if="form.eventsummary.length >= 140">Summary should be with in 140 characters</p>
-                </div>
+<div id="app">
+    <form class="form" v-on:submit.stop.prevent="addEvent">
+        <h2>Volteer.us</h2>
+        </br>
+        <p style="color:red" v-if="isErrorForm">Please resolve the below error</p>
+        <div class="row">
+            <div class="col-4">
+                <label for="organizername">Organizer Name</label>
+                <input type="text" class="form-control" id="organizername" placeholder="" v-model="form.organizername" required>
             </div>
-            <div class="row">
-                <div class="col-4">
-                    <label for="organizeremail">Organizer Email</label>
-                    <input type="text" class="form-control" id="organizeremail" placeholder="" v-model="form.organizeremail" required>
-                </div>
-                <div class="col-1">
-                </div>
-                <div class="col-5">
-                    <label for="eventdetails">Event Details</label>
-                    <textarea class="form-control" v-model="form.eventdetails" id="eventdetails" placeholder=""></textarea>
-                    <p style="color:red" v-if="form.eventdetails.length >= 750">Details should be with in 750 characters</p>
-                </div>
+            <div class="col-1">
             </div>
-            <div class="row">
-                <div class="col-4">
-                    <label for="eventdate">Event Date</label>
-                    <input type="datetime-local" class="form-control" id="eventdate" placeholder="" v-model="form.eventdate" required>
-                    <p style="color:red" v-if="isEventDateError">Event Date must be in future, can only 90 days out</p>
-                </div>
-                <div class="col-1">
-                </div>
-                <div class="col-5">
-                    <label for="location">Location</label>
-                    <input type="text" class="form-control" id="location" placeholder="" v-model="form.eventlocation" />
-                </div>
+            <div class="col-5">
+                <label for="eventsummary">Event Summary</label>
+                <input type="text" class="form-control" id="eventsummary" placeholder="" v-model="form.eventsummary" required>
+                <p style="color:red" v-if="form.eventsummary.length >= 140">Summary should be with in 140 characters</p>
             </div>
-            <div class="row">
-                <div class="col-4">
-                    <label for="noofparticipants">Number of Participants</label>
-                    <input type="number" class="form-control" id="noofparticipants" placeholder="" v-model="form.numberofparticipants" required>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <label for="organizeremail">Organizer Email</label>
+                <input type="text" class="form-control" id="organizeremail" placeholder="" v-model="form.organizeremail" required>
+            </div>
+            <div class="col-1">
+            </div>
+            <div class="col-5">
+                <label for="eventdetails">Event Details</label>
+                <textarea class="form-control" v-model="form.eventdetails" id="eventdetails" placeholder=""></textarea>
+                <p style="color:red" v-if="form.eventdetails.length >= 750">Details should be with in 750 characters</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <label for="eventdate">Event Date</label>
+                <input type="datetime-local" class="form-control" id="eventdate" placeholder="" v-model="form.eventdate" required>
+                <p style="color:red" v-if="isEventDateError">Event Date must be in future, can only 90 days out</p>
+            </div>
+            <div class="col-1">
+            </div>
+            <div class="col-5">
+                <label for="location">Location</label>
+                <input ref="autocomplete" v-model="form.eventlocation" placeholder="Search" class="form-control" type="text" />
+
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <label for="noofparticipants">Number of Participants</label>
+                <input type="number" class="form-control" id="noofparticipants" placeholder="" v-model="form.numberofparticipants" required>
+            </div>
+        </div>
+        </br>
+        <div style="text-align:center">
+            <button type="submit" class="btn btn-primary">Create Event</button>
+        </div>
+    </form>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Event Confirmation Details</h5>
                 </div>
-            </div>
-            </br>
-            <div style="text-align:center">
-                <button type="submit" class="btn btn-primary">Create Event</button>
-            </div>
-        </form>
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Event Confirmation Details</h5>
+                <div class="modal-body">
+                    <div v-if="response.success">
+                        <p style="color:limegreen">Successfully Created Event</p>
+                        <p>Event Confirmation Code: {{ response.eventCode }}</p>
                     </div>
-                    <div class="modal-body">
-                        <div v-if="response.success">
-                            <p style="color:limegreen">Successfully Created Event</p>
-                            <p>Event Confirmation Code: {{ response.eventCode }}</p>
-                        </div>
-                        <div v-else>
-                            <p style="color:red">Error in creation. Please try again!</p>
-                        </div>
+                    <div v-else>
+                        <p style="color:red">Error in creation. Please try again!</p>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" v-on:click="refresh()" class="btn btn-primary" data-dismiss="modal">Close</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" v-on:click="refresh()" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 @section scripts{
     <script>
@@ -95,19 +97,32 @@
                     eventdetails: "",
                     eventdate: "",
                     eventlocation: "",
-                    numberofparticipants: ""
+                    numberofparticipants: "",
+                    eventlatitude: "",
+                    EventLongitude: "",
                 },
                 show: false,
                 isErrorForm: false,
                 isEventDateError: false,
                 response: {
                     eventCode: "",
-                    success:""
+                    success: ""
                 }
             },
             mounted: function () {
                 // PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
-                console.log(JSON.stringify(this.form))
+
+                 this.autocomplete = new google.maps.places.Autocomplete(this.$refs.autocomplete);
+               
+                this.autocomplete.addListener('place_changed', () => {
+                    var place = this.autocomplete.getPlace();
+                  this.form.eventlocation = place.formatted_address;
+
+                    this.form.eventlatitude = place.geometry.location.lat();
+                    this.form.EventLongitude = place.geometry.location.lng();
+
+
+                });
             },
             methods: {
                 // ADD ANY METHODS (CLICK, SUBMIT EVENTS, ETC.)
@@ -118,25 +133,23 @@
                     today = new Date();
                     dateLimit = new Date();
                     dateLimit.setDate(dateLimit.getDate() + 90);
-                    if (eventdate < today || eventdate > dateLimit ) {
+                    if (eventdate < today || eventdate > dateLimit) {
                         this.isErrorForm = true;
                         this.isEventDateError = true;
                     }
                     //Summary,Details Validation
-                    else if (self.form.eventsummary.length >= 140 || self.form.eventdetails.length >= 750)
-                    {
+                    else if (self.form.eventsummary.length >= 140 || self.form.eventdetails.length >= 750) {
                         this.isErrorForm = true;
                     }
                     else {
                         this.isEventDateError = false;
                         this.isErrorForm = false;
-                        console.log(this.form);
                         $.post('http://localhost:7071/api/CreateEvent', JSON.stringify(self.form), function (res) {
                             self.response.eventCode = res.eventCode;
                             self.response.success = res.metaData.success;
                             $('#myModal').modal('show')
                         })
-                        
+
                     }
                 },
                 refresh: function () {
@@ -144,9 +157,9 @@
                 }
             },
             computed: {
-                    // CREATE ANY CALCULATED PROPERTIES HERE. THEY BEHAVE LIKE READ-ONLY DATA
+                // CREATE ANY CALCULATED PROPERTIES HERE. THEY BEHAVE LIKE READ-ONLY DATA
             }
-            });
+        });
     </script>
 
 }
