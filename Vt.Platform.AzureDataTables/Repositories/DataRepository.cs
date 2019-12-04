@@ -27,6 +27,8 @@ namespace Vt.Platform.AzureDataTables.Repositories
             table.OrganizerEmail = dto.OrganizerEmail;
             table.OrganizerName = dto.OrganizerName;
             table.OrganizerValidated = dto.OrganizerValidated;
+            table.EventLatitude = dto.EventLatitude;
+            table.EventLongitude = dto.EventLongitude;
 
             table.Created = DateTime.UtcNow;
             table.Modified = DateTime.UtcNow;

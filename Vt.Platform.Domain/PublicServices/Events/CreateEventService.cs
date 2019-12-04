@@ -103,8 +103,8 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
             [Required]
             public int? NumberOfParticipants { get; set; }
-            public string EventLatitude { get; set; }
-            public string EventLongitude { get; set; }
+            public double EventLatitude { get; set; }
+            public double EventLongitude { get; set; }
 
         }
 
