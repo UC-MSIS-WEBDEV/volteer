@@ -24,7 +24,7 @@ namespace Vt.Platform.AzureDataTables.Models
         public string EventLocation { get; set; }
         public int? NumberOfParticipants { get; set; }
         
-        public double EventLatitude { get; set;}
-        public double EventLongitude { get; set; }
+        public double? EventLatitude { get; set;}
+        public double? EventLongitude { get; set; }
     }
 }

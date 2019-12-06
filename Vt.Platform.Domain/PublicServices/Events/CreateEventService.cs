@@ -95,6 +95,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
             [Required]
             [EmailAddress]
             public string OrganizerEmail { get; set; }
+            [Required]
             public DateTime EventDate { get; set; }
             [Required]
             public string EventSummary { get; set; }
@@ -103,8 +104,8 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
             [Required]
             public int? NumberOfParticipants { get; set; }
-            public double EventLatitude { get; set; }
-            public double EventLongitude { get; set; }
+            public double? EventLatitude { get; set; }
+            public double? EventLongitude { get; set; }
 
         }
 

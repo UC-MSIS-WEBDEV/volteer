@@ -18,7 +18,7 @@
             </div>
             <div class="col-5">
                 <label for="eventsummary">Event Summary</label>
-                <input type="text" class="form-control" id="eventsummary" placeholder="" v-model="form.eventsummary" required>
+                <input type="text" class="form-control" id="eventsummary" placeholder="" v-model="form.eventsummary" spellcheck="true" required>
                 <p style="color:red" v-if="form.eventsummary.length >= 140">Summary should be with in 140 characters</p>
             </div>
         </div>
@@ -31,7 +31,7 @@
             </div>
             <div class="col-5">
                 <label for="eventdetails">Event Details</label>
-                <textarea class="form-control" v-model="form.eventdetails" id="eventdetails" placeholder=""></textarea>
+                <textarea class="form-control" v-model="form.eventdetails" id="eventdetails" spellcheck="true" placeholder=""></textarea>
                 <p style="color:red" v-if="form.eventdetails.length >= 750">Details should be with in 750 characters</p>
             </div>
         </div>
@@ -73,7 +73,7 @@
                         <p>Event Confirmation Code: {{ response.eventCode }}</p>
                     </div>
                     <div v-else>
-                        <p style="color:red">Error in creation. Please try again!</p>
+                        <p style="color:red">Error in Event creation. Please try again with valid details!</p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -106,7 +106,8 @@
                 isEventDateError: false,
                 response: {
                     eventCode: "",
-                    success: ""
+                    success: "",
+                    error: ""
                 }
             },
             mounted: function () {
@@ -144,12 +145,19 @@
                     else {
                         this.isEventDateError = false;
                         this.isErrorForm = false;
-                        $.post('http://localhost:7071/api/CreateEvent', JSON.stringify(self.form), function (res) {
-                            self.response.eventCode = res.eventCode;
-                            self.response.success = res.metaData.success;
-                            $('#myModal').modal('show')
-                        })
-
+                        console.log(self.form);
+                        $.post('http://localhost:7071/api/CreateEvent', JSON.stringify(self.form))
+                            .then((res) => {
+                                self.response.success = res.metaData.success;
+                                if (res.metaData.success == true) {
+                                    self.response.eventCode = res.eventCode;
+                                }
+                                $('#myModal').modal('show')
+                            })
+                            .catch((res) => {
+                                self.response.success = false;
+                                $('#myModal').modal('show')
+                            })
                     }
                 },
                 refresh: function () {
