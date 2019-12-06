@@ -1,41 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Tokenize.Client;
 using Vt.Platform.Domain.PublicServices.Events;
-using Vt.Platform.Domain.PublicServices.System;
 using Vt.Platform.Domain.Repositories;
+using Vt.Platform.Domain.Services;
 using Vt.Platform.Utils;
 
 namespace Vt.Platform.Functions.HttpTriggers.Events
 {
-    public class GetEventFunction
+    public class EditEventFunction
     {
         private readonly ILogger<GetEventFunction> _logger;
+        private readonly IRandomGenerator _randomGenerator;
+        private readonly IDataRepository _dataRepository;
         private readonly IObjectTokenizer _objectTokenizer;
-        private readonly IDataRepository dataRepository;
+        private readonly IEmailService _emailService;
 
-        public GetEventFunction(
+        public EditEventFunction(
             ILogger<GetEventFunction> logger,
+            IDataRepository dataRepository,
+            IRandomGenerator randomGenerator,
             IObjectTokenizer objectTokenizer,
-            IDataRepository dataRepository)
+            IEmailService emailService)
         {
             _logger = logger;
+            _randomGenerator = randomGenerator;
+            _dataRepository = dataRepository;
             _objectTokenizer = objectTokenizer;
-            this.dataRepository = dataRepository;
+            _emailService = emailService;
         }
 
-        [FunctionName("GetEvent")]
+        [FunctionName("EditEvent")]
         public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
         {
             var response = await req.CallService(
-                () => new GetEventService(_logger, dataRepository),
+                () => new EditEventService(_dataRepository, _randomGenerator, _logger, _emailService),
                 _objectTokenizer,
                 HttpMethod.Get,
                 HttpMethod.Post);

@@ -22,5 +22,7 @@ namespace Vt.Platform.Domain.Models.Persistence
         public string EventDetails { get; set; }
         public string EventLocation { get; set; }
         public int NumberOfParticipants { get; set; }
+        public double EventLatitude { get; set; }
+        public double EventLongitude { get; set; }
     }
 }

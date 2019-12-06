@@ -14,9 +14,9 @@ namespace Vt.Platform.Domain.PublicServices.Events
     public class GetEventService : BaseService<GetEventService.Request, GetEventService.Response>
     {
         private IDataRepository _dataRepository;
-        public GetEventService(ILogger logger) : base(logger)
+        public GetEventService(ILogger logger, IDataRepository dataRepository) : base(logger)
         {
-            /*_dataRepository = dataRepository;*/
+            _dataRepository = dataRepository;
         }
 
         protected override async Task<Response> Implementation(Request request)
@@ -24,7 +24,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
             await Task.CompletedTask;
 
              EventDto RetDto = await _dataRepository.GetEventAsync(request.EventCode);
-
+             
             return new Response
             {
                 EventCode = request.EventCode,

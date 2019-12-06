@@ -72,20 +72,22 @@
 
             },
             methods: {
-                    makeObject: function () {
+                makeObject: function () {
+                    var self = this;
                     console.log("clicked");
                     var newEvent = {
-                        organizerName: createEvent.orgName,
-                        organizerEmail: createEvent.orgEmail,
-                        eventDate: createEvent.eventDate,
-                        numberOfParticipantsRequested: createEvent.numPart,
-                        summary: createEvent.eventSum,
-                        details: createEvent.eventDet,
-                        location: createEvent.loc
+                        organizerName: self.orgName,
+                        organizerEmail: self.orgEmail,
+                        eventDate: self.eventDate,
+                        numberOfParticipants: self.numPart,
+                        eventSummary: self.eventSum,
+                        eventDetails: self.eventDet,
+                        eventLocation: self.loc
                     }
                     var jsonObject = JSON.stringify(newEvent);
                     console.log(jsonObject);
-                    $.ajax({
+                    $.post("http://localhost:7071/api/CreateEvent", JSON.stringify(newEvent));
+                   /* $.ajax({
                         url: "http://localhost:7071/api/CreateEvent",
                         dataType: 'json',
                         crossDomain: true,
@@ -96,7 +98,7 @@
                         
                     }).fail(function () {
                         alert("there wasn an error");
-                    });
+                    });*/
                 }
              }
 

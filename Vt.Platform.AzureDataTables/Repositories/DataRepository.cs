@@ -27,6 +27,8 @@ namespace Vt.Platform.AzureDataTables.Repositories
             table.OrganizerEmail = dto.OrganizerEmail;
             table.OrganizerName = dto.OrganizerName;
             table.OrganizerValidated = dto.OrganizerValidated;
+            table.EventLatitude = dto.EventLatitude;
+            table.EventLongitude = dto.EventLongitude;
 
             table.Created = DateTime.UtcNow;
             table.Modified = DateTime.UtcNow;
@@ -64,7 +66,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
         public async Task<EventDto> GetEventAsync(string volteerEventCode)
         {
             var table = await GetTable("EventData");
-            var result = await table.GetEntity<EventTable>(volteerEventCode, "Event");
+            var result = await table.GetEntity<EventTable>("Event", volteerEventCode);
             if (result == null)
             {
                 return null;
@@ -74,6 +76,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
             {
                 EventCode = result.PartitionKey,
             };
+            
 
             MapEventTableToEventDto(result, dto);
             return dto;
