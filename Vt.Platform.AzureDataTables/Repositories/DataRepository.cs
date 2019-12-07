@@ -89,7 +89,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
             var dto = new EventDto
             {
-                EventCode = result.PartitionKey,
+                EventCode = result.RowKey,
                 ConfirmationCode = result.ConfirmationCode,
                 EventDate = result.EventDate,
                 EventDetails = result.EventDetails,
@@ -229,9 +229,9 @@ namespace Vt.Platform.AzureDataTables.Repositories
             }
         }
 
-        public async Task<string> GetMyEventsAsync(string email)
+        public async Task<string> GetMyEventsAsync(string email, string name)
         {
-            string returningEmailBodyString = "Following are the vents you are involved in: <br> Events organized by you: <br>";
+            string returningEmailBodyString = "Hi " + name + "," + "<br>Following are the vents you are involved in: <br> <strong>Events organized by you:</strong> <br>";
             var eventTable = await GetTable("EventData");
             var eventtq = new TableQuery<EventTable>
             {
@@ -253,7 +253,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
             foreach (var item in eventResults)
             {
-                returningEmailBodyString += "Event Name: " + item.EventDetails + "<br>" + "https://volteer.us/events/" + item.RowKey + "<br>";
+                returningEmailBodyString += "Event Name: " + item.EventDetails + "<br>" + "https://volteer.us/events?" + item.RowKey + "<br>";
                 var dto = new EventDto
                 {
                     EventCode = item.RowKey,
@@ -263,13 +263,13 @@ namespace Vt.Platform.AzureDataTables.Repositories
                 eventdtos.Add(dto);
             }
 
-            returningEmailBodyString += "Events you are participating in: <br>";
+            returningEmailBodyString += "<strong>Events you are participating in:</strong> <br>";
             foreach (var item in participantResults)
             {
                 var retrievedEvent = await GetEventAsync(item.PartitionKey);
                 if (retrievedEvent != null)
                 {
-                    returningEmailBodyString += "Event Name: " + retrievedEvent.EventDetails + "<br>" + "https://volteer.us/events/" + retrievedEvent.EventCode + "<br>";
+                    returningEmailBodyString += "Event Name: " + retrievedEvent.EventDetails + "<br>" + "https://volteer.us/events?" + retrievedEvent.EventCode + "<br>";
                     participanteventdtos.Add(retrievedEvent);
                 }
             }

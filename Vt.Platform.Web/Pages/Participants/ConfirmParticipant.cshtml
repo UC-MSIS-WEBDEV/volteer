@@ -4,8 +4,6 @@
     ViewData["Title"] = "ConfirmParticipant";
 }
 
-<h1>ConfirmParticipant</h1>
-
 <h1 style="text-align:center">Participant Confirmation</h1>
 <div id="participantConfirmation">
     <div v-if="isSuccess">
@@ -13,7 +11,7 @@
             <h4>Yayyyy!! Your participation has been confirmed.</h4>
             <p>
                 You can now share the event link with your contacts
-                <a v-bind:href="'https://volteer.us/events/'+ form.EventCode">https://volteer.us/events/{{ form.EventCode }}</a>
+                <a v-bind:href="'https://volteer.us/events?'+ form.EventCode">https://volteer.us/events/{{ form.EventCode }}</a>
             </p>
         </div>
     </div>
@@ -27,12 +25,7 @@
 
 @section scripts{
     <script>
-        var router = new VueRouter({
-            mode: 'history',
-            routes: []
-        });
         var app = new Vue({
-            router,
             el: "#participantConfirmation",
             data: {
                 // PLACE DATA PROPERTIES HERE - THIS IS THE "MODEL" FOR OUR PROGRAM
@@ -45,18 +38,22 @@
             },
             mounted: function () {
                 var self = this;
-                var eventCode = self.$route.query.event;
+                var pageURL = window.location.href;
+                var array = pageURL.split('?');
+                var params = array[array.length - 1];
+                var separateParams = params.split('/');
+                var eventCode = separateParams[0];
                 self.form.EventCode = eventCode;
-                var participantCode = self.$route.query.participant;
+                var participantCode = separateParams[1];
                 self.form.ParticipantCode = participantCode;
                 //PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
                 $.post('http://localhost:7071/api/ConfirmParticipant', JSON.stringify(self.form), function (res) {
                     if (res.metaData.success == true) {
-                        isSuccess = true;
+                        self.isSuccess = true;
                     }
                     else
                     {
-                        isError = true;
+                        self.isError = true;
                     }                    
                 })               
             },

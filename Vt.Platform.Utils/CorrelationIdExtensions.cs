@@ -26,9 +26,9 @@ namespace Vt.Platform.Utils
         {
             iterations++;
 
-            if (iterations > 1000)
+            if (iterations > 10000)
             {
-                throw new Exception("Sync Correlation Max Iterations of 1000 reached");
+                throw new Exception("Sync Correlation Max Iterations of 10000 reached");
             }
 
             var t = root.GetType();

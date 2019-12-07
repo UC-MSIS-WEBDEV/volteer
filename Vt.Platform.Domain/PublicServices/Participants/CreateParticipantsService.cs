@@ -52,8 +52,8 @@ namespace Vt.Platform.Domain.PublicServices.Participants
 
             MailAddress mailAddress = new MailAddress(request.ParticipantEmail);
             MailAddress[] mailAddresses = new MailAddress[] { mailAddress };
-            string emailBody = "This is an auto generated email. Please click on the below link to conform your participation to the event with event code" + request.EventCode + "<br>";
-            emailBody = emailBody + "http://localhost:57834/participants/ConfirmParticipant?event=" + request.EventCode + "&participant=" + partcipantCode;
+            string emailBody = "This is an auto generated email. Please click on the below link to conform your participation to the event " + request.EventCode + "<br>";
+            emailBody = emailBody + "http://localhost:57834/participants/ConfirmParticipant?" + request.EventCode + "/" + partcipantCode;
             string emailSubject = "Confirmation email for the event participation";
             await _emailService.SendEmail(mailAddresses, emailSubject, emailBody);
 

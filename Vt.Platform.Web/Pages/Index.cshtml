@@ -3,9 +3,168 @@
 @{
     ViewData["Title"] = "Home page";
 }
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        body {
+            background-image: url("https://cdn.hipwallpaper.com/i/57/18/DQ2Cti.jpg");
+            background-size: cover;
+        }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to Volteer.us</h1>
-    
-    <p>Hello World!</p>
-</div>
+        button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 53px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .list-table-content {
+            width: max-content;
+            height: max-content;
+        }
+
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+
+        .button-div {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+
+<body class="is-preload">
+    <div class="text-center">
+        <h1 class="display-4">Welcome to Volteer.us</h1>
+        <div id="page-wrapper">
+            <header id="header" class="alt">
+            </header>
+            <div class="is-chopped" data-choppable="true">
+                <table>
+                    <tr>
+                        <td>
+                            <div style="text-align:justify;">
+                                <p>
+                                    The purpose of volteer.us is to be a web application that can allow users to create and manage
+                                    volunteering opportunities that they can share with other people. The site will also allow other
+                                    users to view the event and sign up to participate. During the sign-up process the site will
+                                    display a near-realtime list of participants so users can see how many people have already signed up
+                                    to help decide if they want to participate. The process is intended to be "friction-free" by not
+                                    requiring a sign-up process. Instead, users will use their email address to sign up and manage their event.
+                                </p>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="chop-columns-1">
+                                <table class="table-striped table-bordered list-table-content">
+                                    <tr>
+                                        <th class="">Volteer</th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="#" style="color:inherit;">
+                                                <span>
+                                                    Volunteers
+                                                </span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="#" style="color:inherit;">
+                                                <span>
+                                                    Events
+                                                </span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="#" style="color:inherit;">
+                                                <span>
+                                                    Become a Participant
+                                                </span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="app" class="button-div">
+        <button type="button" data-toggle="modal" data-target="#getMyEventsModal" class="btn btn-primary">Get my Events</button>
+        <div id="getMyEventsModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Please provide your Name and Email</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="resetModal">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form v-on:submit.stop.prevent="getMyEvents">
+                        <div class="modal-body">
+                            <div v-if="getMyEventsSuccess">
+                                <p><strong style="color:green;">Success!</strong> An email has been sent with your events.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="Name" class="fontStyle">Name</label>
+                                <input type="text" class="form-control" id="Name" placeholder="Name" v-model="Name" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="Email" class="fontStyle">Email</label>
+                                <input type="email" class="form-control" id="Email" placeholder="Email" v-model="Email" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" v-on:click="resetModal">Close</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+@section scripts
+{
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                Name: "",
+                Email: "",
+                getMyEventsSuccess: false
+            },
+            methods: {
+                getMyEvents: function () {
+                    var self = this;
+                    $.get('http://localhost:7071/api/GetMyEvents?mail=' + self.Email + '&name=' + self.Name, function (myEvents) {
+                        if (myEvents.metaData.success == true) {
+                            self.getMyEventsSuccess = true;
+                        }
+                    })
+                    self.Name = "";
+                    self.Email = "";
+                },
+                resetModal: function () {
+                    var self = this;
+                    self.getMyEventsSuccess = false;
+                    self.Name = "";
+                    self.Email = "";
+                }
+            }
+        })
+    </script>
+}
