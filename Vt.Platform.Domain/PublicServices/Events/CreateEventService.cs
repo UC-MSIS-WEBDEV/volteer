@@ -98,7 +98,9 @@ namespace Vt.Platform.Domain.PublicServices.Events
             [Required]
             public DateTime EventDate { get; set; }
             [Required]
+            [StringLength(139)] 
             public string EventSummary { get; set; }
+            [StringLength(749)] 
             public string EventDetails { get; set; }
             public string EventLocation { get; set; }
 
