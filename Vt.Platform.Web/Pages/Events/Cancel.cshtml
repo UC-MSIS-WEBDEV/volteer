@@ -1,0 +1,60 @@
+﻿@page
+@model Vt.Platform.Web.Pages.Events.CancelModel
+@{
+    ViewData["Title"] = "Cancel Event";
+}
+
+<h1 style="text-align:center">Event Cancellation</h1>
+<div id="cancelEvent">
+    <div>
+        <p>You have initiated event cancellation. Please click the cancel button to cancel the event.</p>
+        <button class="btn btn-primary" v-on:click="confirmCancel">Cancel</button>
+    </div>
+    <div v-if="cancelSuccess">
+        <div style="text-align:center">
+            <h4>The event has been cancelled.</h4>
+
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var app = new Vue({
+            el: "#cancelEvent",
+            data: {
+                // PLACE DATA PROPERTIES HERE - THIS IS THE "MODEL" FOR OUR PROGRAM
+                form: {
+                    EventCode: "",
+                    ConfirmationCode: ""
+                },
+                eventName: "",
+                cancelSuccess: false
+            },
+            mounted: function () {
+
+            },
+            methods: {
+                confirmCancel: function () {
+                    var self = this;
+                    var pageURL = window.location.href;
+                    var array = pageURL.split('?');
+                    var params = array[array.length - 1];
+                    var separateParams = params.split('/');
+                    var eventCode = separateParams[0];
+                    var confirmationCode = separateParams[1];
+                    self.form.EventCode = eventCode;
+                    self.form.ConfirmationCode = confirmationCode;
+                    //PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
+                    $.post('http://localhost:7071/api/CancelEvent', JSON.stringify(self.form), function (res) {
+                        if (res.metaData.success == true) {
+                            self.cancelSuccess = true;
+                        }
+                    })
+                }
+            },
+            computed: {
+                // CREATE ANY CALCULATED PROPERTIES HERE. THEY BEHAVE LIKE READ-ONLY DATA
+            }
+        });</script>
+
+}

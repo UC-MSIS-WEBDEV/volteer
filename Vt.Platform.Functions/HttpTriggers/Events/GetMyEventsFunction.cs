@@ -14,14 +14,14 @@ using Vt.Platform.Utils;
 
 namespace Vt.Platform.Functions.HttpTriggers.Events
 {
-    public class GetEventFunction
+    public class GetMyEventsFunction
     {
-        private readonly ILogger<GetEventFunction> _logger;
+        private readonly ILogger<GetMyEventsFunction> _logger;
         private readonly IDataRepository _dataRepository;
         private readonly IObjectTokenizer _objectTokenizer;
 
-        public GetEventFunction(
-            ILogger<GetEventFunction> logger,
+        public GetMyEventsFunction(
+            ILogger<GetMyEventsFunction> logger,
             IDataRepository dataRepository,
             IObjectTokenizer objectTokenizer)
         {
@@ -30,12 +30,12 @@ namespace Vt.Platform.Functions.HttpTriggers.Events
             _objectTokenizer = objectTokenizer;
         }
 
-        [FunctionName("GetEvent")]
+        [FunctionName("GetMyEvents")]
         public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
         {
             var response = await req.CallService(
-                () => new GetEventService(_dataRepository, _logger),
+                () => new GetMyEventsService(_dataRepository, _logger),
                 _objectTokenizer,
                 HttpMethod.Get,
                 HttpMethod.Post);

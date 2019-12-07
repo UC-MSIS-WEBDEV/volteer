@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Tokenize.Client;
 using Vt.Platform.Domain.PublicServices.Events;
 using Vt.Platform.Domain.PublicServices.Participants;
+using Vt.Platform.Domain.Repositories;
+using Vt.Platform.Domain.Services;
 using Vt.Platform.Functions.HttpTriggers.Events;
 using Vt.Platform.Utils;
 
@@ -16,14 +18,23 @@ namespace Vt.Platform.Functions.HttpTriggers.Participants
 {
     public class GetParticipantsFunction
     {
-        private readonly ILogger<GetEventFunction> _logger;
+        private readonly ILogger<GetParticipantsFunction> _logger;
+        private readonly IRandomGenerator _randomGenerator;
+        private readonly IDataRepository _dataRepository;
+        private readonly IEmailService _emailService;
         private readonly IObjectTokenizer _objectTokenizer;
 
         public GetParticipantsFunction(
-            ILogger<GetEventFunction> logger,
+            ILogger<GetParticipantsFunction> logger,
+            IDataRepository dataRepository,
+            IRandomGenerator randomGenerator,
+            IEmailService emailService,
             IObjectTokenizer objectTokenizer)
         {
             _logger = logger;
+            _randomGenerator = randomGenerator;
+            _dataRepository = dataRepository;
+            _emailService = emailService;
             _objectTokenizer = objectTokenizer;
         }
 
@@ -32,7 +43,7 @@ namespace Vt.Platform.Functions.HttpTriggers.Participants
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
         {
             var response = await req.CallService(
-                () => new GetParticipantsService(_logger),
+                () => new GetParticipantsService(_dataRepository, _randomGenerator, _emailService, _logger),
                 _objectTokenizer,
                 HttpMethod.Get,
                 HttpMethod.Post);

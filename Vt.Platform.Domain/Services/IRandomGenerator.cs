@@ -11,6 +11,7 @@ namespace Vt.Platform.Domain.Services
     {
         Task<string> GetEventCode();
         Task<string> GetSigninToken();
+        Task<string> GetParticipantCode();
     }
 
     public class RandomGenerator : IRandomGenerator
@@ -31,6 +32,18 @@ namespace Vt.Platform.Domain.Services
         {
             await Task.CompletedTask;
             return Guid.NewGuid().ToString("N");
+        }
+
+        public async Task<string> GetParticipantCode()
+        {
+            await Task.CompletedTask;
+            int tokenLength = 6; 
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToArray();
+            var rnd = new RNGCryptoServiceProvider();
+            byte[] arr = new byte[75];
+            rnd.GetNonZeroBytes(arr);
+            var res = new string(Convert.ToBase64String(arr).Where(c => chars.Contains(c)).Take(tokenLength).ToArray());
+            return res;
         }
     }
 }

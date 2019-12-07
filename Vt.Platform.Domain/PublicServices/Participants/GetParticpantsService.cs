@@ -6,55 +6,69 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Vt.Platform.Domain.Enums;
 using Vt.Platform.Domain.Models.Api;
+using Vt.Platform.Domain.Models.Persistence;
+using Vt.Platform.Domain.Repositories;
+using Vt.Platform.Domain.Services;
 using Vt.Platform.Utils;
 
 namespace Vt.Platform.Domain.PublicServices.Participants
 {
     public class GetParticipantsService : BaseService<GetParticipantsService.Request, GetParticipantsService.Response>
     {
-        public GetParticipantsService(ILogger logger) : base(logger)
+        private IDataRepository _dataRepository;
+        private IRandomGenerator _randomGenerator;
+        private IEmailService _emailService;
+        public GetParticipantsService(
+          IDataRepository dataRepository,
+          IRandomGenerator randomGenerator,
+          IEmailService emailService,
+          ILogger logger) : base(logger)
         {
+            // INSTANTIATE BASE VALUES
+            _dataRepository = dataRepository;
+            _randomGenerator = randomGenerator;
+            _emailService = emailService;
         }
 
         protected override async Task<Response> Implementation(Request request)
         {
             await Task.CompletedTask;
-            return new Response
-            {
-                EventCode = request.EventCode,
-                UpdatedAt = DateTime.UtcNow,
-                Participants = new[]
-                {
-                    new ParticipantDisplayInfoModel { Name = "Benny Davidson", Status = ParticipantEventStatus.Confirmed },
-                    new ParticipantDisplayInfoModel { Name = "Matt Gilbert", Status = ParticipantEventStatus.Tentative },
-                    new ParticipantDisplayInfoModel { Name = "Roman Boone", Status = ParticipantEventStatus.Confirmed },
-                    new ParticipantDisplayInfoModel { Name = "Lynette Blake", Status = ParticipantEventStatus.Confirmed },
-                    new ParticipantDisplayInfoModel { Name = "Marianne Baker", Status = ParticipantEventStatus.Confirmed },
-                    new ParticipantDisplayInfoModel { Name = "Geoffrey Hamilton", Status = ParticipantEventStatus.Tentative },
-                    new ParticipantDisplayInfoModel { Name = "Janice Bailey", Status = ParticipantEventStatus.Confirmed },
-                    new ParticipantDisplayInfoModel { Name = "Brenda Cook", Status = ParticipantEventStatus.Confirmed },
-                    new ParticipantDisplayInfoModel { Name = "Betsy Roberts", Status = ParticipantEventStatus.Tentative },
-                    new ParticipantDisplayInfoModel { Name = "Lionel Ross", Status = ParticipantEventStatus.Confirmed }
-                }
-            };
+            ParticipantDto[] dto = await _dataRepository.GetParticipantsAsync(request.EventCode);
+
+            var response = new Response();
+            response.EventCode = request.EventCode;
+            response.UpdatedAt = DateTime.Now;
+            response.Participants = dto;
+           
+
+    
+
+            return response;
         }
 
         public override IDictionary<int, string> GetErrorCodes()
         {
-            return new Dictionary<int, string>();
+            // WE CAN DEFINE ANY CUSTOM ERROR CODES HERE
+            return new Dictionary<int, string>
+            {
+
+            };
         }
 
         public class Request : BaseRequest
         {
-            [Required]
+            // REQUEST DATA MODEL GOES HERE
             public string EventCode { get; set; }
+
         }
 
         public class Response : BaseResponse
         {
+            // RESPONSE DATA MODEL GOES HERE
             public string EventCode { get; set; }
-            public ParticipantDisplayInfoModel[] Participants { get; set; }
+            public ParticipantDto[] Participants { get; set; }
             public DateTime UpdatedAt { get; set; }
+
         }
     }
 }

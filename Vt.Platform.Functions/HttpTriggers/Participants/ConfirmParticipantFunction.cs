@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Tokenize.Client;
-using Vt.Platform.Domain.PublicServices.Events;
-using Vt.Platform.Domain.PublicServices.System;
+using Vt.Platform.Domain.PublicServices.Participants;
 using Vt.Platform.Domain.Repositories;
+using Vt.Platform.Domain.Services;
 using Vt.Platform.Utils;
 
-namespace Vt.Platform.Functions.HttpTriggers.Events
+namespace Vt.Platform.Functions.HttpTriggers.Participants
 {
-    public class GetEventFunction
+    public class ConfirmParticipantFunction
     {
-        private readonly ILogger<GetEventFunction> _logger;
+        private readonly ILogger<ConfirmParticipantFunction> _logger;
         private readonly IDataRepository _dataRepository;
         private readonly IObjectTokenizer _objectTokenizer;
 
-        public GetEventFunction(
-            ILogger<GetEventFunction> logger,
+        public ConfirmParticipantFunction(
+            ILogger<ConfirmParticipantFunction> logger,
             IDataRepository dataRepository,
             IObjectTokenizer objectTokenizer)
         {
@@ -30,12 +27,12 @@ namespace Vt.Platform.Functions.HttpTriggers.Events
             _objectTokenizer = objectTokenizer;
         }
 
-        [FunctionName("GetEvent")]
+        [FunctionName("ConfirmParticipant")]
         public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req)
         {
             var response = await req.CallService(
-                () => new GetEventService(_dataRepository, _logger),
+                () => new ConfirmParticipantService(_dataRepository, _logger),
                 _objectTokenizer,
                 HttpMethod.Get,
                 HttpMethod.Post);

@@ -12,6 +12,8 @@ namespace Vt.Platform.Domain.Repositories
         Task<EventDto> GetEventAsync(string volteerEventCode);
         Task SaveOrUpdateEvent(EventDto volteerEvent);
 
+        Task CancelEventAsync(EventDto volteerEvent);
+
         // PARTICIPANT REPOSITORY ACTIONS
         Task<ParticipantDto[]> GetParticipantsAsync(string volteerEventCode);
         Task<ParticipantDto> GetParticipantAsync(string volteerEventCode, string participantCode);
@@ -19,5 +21,6 @@ namespace Vt.Platform.Domain.Repositories
 
         // NOTIFICATION REPOSITORY ACTIONS
         Task LogNotificationAsync(NotificationDto notification);
+        Task<string> GetMyEventsAsync(string email);
     }
 }
