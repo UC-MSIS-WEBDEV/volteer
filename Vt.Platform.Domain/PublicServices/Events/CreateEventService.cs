@@ -66,13 +66,13 @@ namespace Vt.Platform.Domain.PublicServices.Events
             MailAddress mailAddress = new MailAddress(request.OrganizerEmail);
             MailAddress[] mailAddresses = new MailAddress[] { mailAddress };
             string emailBodyfl = "Your event has been created. Please do not delete this email as it contains important links you will need to confirm and to administer your event.<br/> <br/> Next Steps: <br/> <br/>";
-            string emailBodysl = "1. Confirm your Event <br/> Please click the following URL to confirm your event <br/> https://volteer.us/confirmEvent?event="+response.EventCode+"&confirm="+ confirmationCode + "<br/> <br/>";
-            string emailBodytl = "2. Share your Event <br/> Use this link to share your event with your contacts <br/> https://volteer.us/events/"+response.EventCode + "<br/> <br/>";
-            string emailBodyfol = "3. Administer your Event <br/> *Do Not Share This Link*. The link below is just for you and allows you to administer your event. <br/> Administration Link: https://volteer.us/editEvent?event="+response.EventCode+"&adminCode="+ organizerCode + "<br/> <br/>";
-            string emailBodyfil = "4. Delete your Event <br/> *Do Not Share This Link*. The link below is just for you and allows you to delete your event. <br/> Delete Event Link: https://volteer.us/cancelEvent?event="+response.EventCode+"&adminCode="+ organizerCode;
+            string emailBodysl = "1. Confirm your Event <br/> Please click the following URL to confirm your event <br/> https://volteer.us/confirmEvent?"+response.EventCode+"/"+ confirmationCode + "<br/> <br/>";
+            string emailBodytl = "2. Share your Event <br/> Use this link to share your event with your contacts <br/> https://volteer.us/events?"+response.EventCode + "<br/> <br/>";
+            string emailBodyfol = "3. Administer your Event <br/> *Do Not Share This Link*. The link below is just for you and allows you to administer your event. <br/> Administration Link: https://volteer.us/editEvent?"+response.EventCode+"/"+ organizerCode + "<br/> <br/>";
+            string emailBodyfil = "4. Delete your Event <br/> *Do Not Share This Link*. The link below is just for you and allows you to delete your event. <br/> Delete Event Link: https://volteer.us/cancelEvent?"+response.EventCode+"/"+ organizerCode;
             string emailBody = emailBodyfl + emailBodysl + emailBodytl+ emailBodyfol+ emailBodyfil;
             string emailSubject = "Volteer Event Created - Confirmation Required ";
-            //Currently hardcoding email receipient, as it only accomodates verified email.
+            //Currently passing only verified email recipient, as it only accomodates verified email.
             await _emailservice.SendEmail(mailAddresses, emailSubject, emailBody);
 
             return response;

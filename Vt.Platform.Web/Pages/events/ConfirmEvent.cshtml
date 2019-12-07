@@ -22,16 +22,9 @@
         </div>
     </div>
 </div>
-<script src="https://unpkg.com/vue-router"></script>
-
 @section scripts{
     <script>
-        var router = new VueRouter({
-            mode: 'history',
-            routes: []
-        });
         var app = new Vue({
-            router,
             el: "#confirmEvent",
             data: {
                 // PLACE DATA PROPERTIES HERE - THIS IS THE "MODEL" FOR OUR PROGRAM
@@ -44,9 +37,13 @@
             },
             mounted: function () {
                 var self = this;
-                var eventCode = self.$route.query.event;
+                var pageURL = window.location.href;
+                var array = pageURL.split('?');
+                var params = array[array.length - 1];
+                var separateParams = params.split('/');
+                var eventCode = separateParams[separateParams.length - 2];
+                var confirmationCode = separateParams[separateParams.length - 1];
                 self.form.EventCode = eventCode;
-                var confirmationCode = self.$route.query.confirm;
                 self.form.ConfirmationCode = confirmationCode;
                 //PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
                 $.get('http://localhost:7071/api/GetEvent?eventcode=' + eventCode, function (indata) {
@@ -66,7 +63,6 @@
                 SetValidateForEvent: function (self) {
                     $.post('http://localhost:7071/api/ConfirmEvent', JSON.stringify(self.form), function (res) {
                         var isEventValid = res.isValidated;
-                        console.log(isEventValid);
                         if (isEventValid != "true") {
                             self.isEventInValid = true;
                         }
