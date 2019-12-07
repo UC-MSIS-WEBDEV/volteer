@@ -8,7 +8,7 @@
     <div id="editStatus">
         <h3>Update Participant Status</h3>
     
-        <form class="form" v-on:submit.stop.prevent="editStatus">
+        <form class="form" v-on:submit.stop.prevent="editStatus" v-if="!isSuccess && !isError">
             <div class="input-group col-md-4 mt-3">
                 <div class="input-group-prepend">
                     <div class="input-group-text">
@@ -35,18 +35,18 @@
             </div>
             <hr />
             <div class="input-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button :disabled="status == ''" type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>
 
         <div v-if="isSuccess">
-            <div style="text-align:center">
-                Participation status has been updates sucessfully.
+            <div class="alert alert-primary mt-5" role="alert">
+                Participant status updated successfully
             </div>
         </div>
         <div v-if="isError">
-            <div style="text-align:center">
-                OOPS! There was an error in changing the participation status.
+            <div class="alert alert-danger mt-5" role="alert">
+                Participant status update failed
             </div>
         </div>
     </div>
@@ -58,8 +58,8 @@
             el: "#editStatus",
             data: {
                 form: {
-                    EventCode: "SUSX27",
-                    ParticipantCode: "TNLU9Q",
+                    EventCode: "",
+                    ParticipantCode: "",
                     ParticipantStatus: ""
                 },
                 status : '',
@@ -67,24 +67,36 @@
                 isError: false,
             },
             mounted: function () {
-                var self = this;
-                var url = window.location.href;
+                
             },
             methods: {
                 editStatus: function () {
                     var self = this;
+                    var pageURL = window.location.href;
+                    var array = pageURL.split('?');
+                    var params = array[array.length - 1];
+                    var separateParams = params.split('/');
+                    var eventCode = separateParams[0];
+                    self.form.EventCode = eventCode;
+                    var participantCode = separateParams[1];
+                    self.form.ParticipantCode = participantCode;
                     self.form.ParticipantStatus = self.status;
                     console.log(JSON.stringify(self.form));
                     
-                    $.post('http://localhost:7071/api/EditParticipantStatus', JSON.stringify(self.form), function (res) {
-                        if (res.metaData.success == true) {
-                            isSuccess = true;
+                    $.ajax({
+                        url : 'http://localhost:7071/api/EditParticipantStatus',
+                        type : 'POST',
+                        data : JSON.stringify(self.form),
+                        dataType:'json',
+                        success : function(data) {              
+                            self.isSuccess = true;
+                        },
+                        error : function(request,error)
+                        {
+                            self.isError = true;
                         }
-                        else {
-                            isError = true;
-                        }
-                    })
-                }
+                    });
+                 }
             },
             computed: {
             }
