@@ -253,24 +253,32 @@ namespace Vt.Platform.AzureDataTables.Repositories
 
             foreach (var item in eventResults)
             {
-                returningEmailBodyString += "Event Name: " + item.EventDetails + "<br>" + "https://volteer.us/events?" + item.RowKey + "<br>";
-                var dto = new EventDto
+                var isRecentEvent = item.EventDate - DateTime.Today;
+                if (isRecentEvent.Days < 90 || isRecentEvent.Days > -30)
                 {
-                    EventCode = item.RowKey,
-                    EventDetails = item.EventDetails,
-                };
-                MapEventTableToEventDto(item, dto);
-                eventdtos.Add(dto);
+                    returningEmailBodyString += "Event Name: " + item.EventDetails + "<br>" + "https://volteer.us/events?" + item.RowKey + "<br>";
+                    var dto = new EventDto
+                    {
+                        EventCode = item.RowKey,
+                        EventDetails = item.EventDetails,
+                    };
+                    MapEventTableToEventDto(item, dto);
+                    eventdtos.Add(dto);
+                }                
             }
 
             returningEmailBodyString += "<strong>Events you are participating in:</strong> <br>";
             foreach (var item in participantResults)
             {
-                var retrievedEvent = await GetEventAsync(item.PartitionKey);
+                var retrievedEvent = await GetEventAsync(item.PartitionKey);               
                 if (retrievedEvent != null)
                 {
-                    returningEmailBodyString += "Event Name: " + retrievedEvent.EventDetails + "<br>" + "https://volteer.us/events?" + retrievedEvent.EventCode + "<br>";
-                    participanteventdtos.Add(retrievedEvent);
+                    var isRecentEvent = retrievedEvent.EventDate - DateTime.Today;
+                    if (isRecentEvent.Days < 90 || isRecentEvent.Days > -30)
+                    {
+                        returningEmailBodyString += "Event Name: " + retrievedEvent.EventDetails + "<br>" + "https://volteer.us/events?" + retrievedEvent.EventCode + "<br>";
+                        participanteventdtos.Add(retrievedEvent);
+                    }                    
                 }
             }
 
