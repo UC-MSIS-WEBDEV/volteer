@@ -33,15 +33,28 @@ namespace Vt.Platform.Domain.PublicServices.Events
               EventCode = eventCode,
               ConfirmationCode = confirmationCode
             };
-
-            // SAVE IN REPOSITORY
-            await _dataRepository.SaveOrUpdateEvent(dto);
-
-            return new Response
+            EventDto eventDto = await _dataRepository.GetEventAsync(eventCode);
+            if (eventDto.EventCode == eventCode && eventDto.ConfirmationCode == confirmationCode)
             {
-                eventCode = eventCode,
-                isValidated = "true"
-            };
+                // SAVE IN REPOSITORY
+                await _dataRepository.SaveOrUpdateEvent(dto);
+
+                return new Response
+                {
+                    eventCode = eventCode,
+                    isValidated = "true",
+                    Message="Success"
+                };
+            }
+            else
+            {
+                return new Response
+                {
+                    eventCode = eventCode,
+                    isValidated = "false",
+                    Message="Event COde or Confirmation code is not valid"
+                };
+            }
 
         }
 
@@ -68,6 +81,8 @@ namespace Vt.Platform.Domain.PublicServices.Events
             public string eventCode { get; set; }
 
             public string isValidated { get; set; }
+
+            public string Message { get; set; }
         }
     }
 }

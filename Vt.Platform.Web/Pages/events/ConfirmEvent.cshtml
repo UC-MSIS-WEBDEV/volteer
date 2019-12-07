@@ -33,7 +33,8 @@
                     ConfirmationCode:""
                 },
                 eventName:"",
-                isEventInValid: false
+                isEventInValid: false,
+                Message:""
             },
             mounted: function () {
                 var self = this;
@@ -45,29 +46,17 @@
                 var confirmationCode = separateParams[separateParams.length - 1];
                 self.form.EventCode = eventCode;
                 self.form.ConfirmationCode = confirmationCode;
-                //PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
-                $.get('http://localhost:7071/api/GetEvent?eventcode=' + eventCode, function (indata) {
-                    eventDate = new Date(indata.eventDate);
-                    todayDate = new Date();
-                    difference = todayDate - eventDate;
-                    if (confirmationCode == indata.confirmationCode && difference <= 0) {
-                        self.eventName = indata.summary;
-                        self.SetValidateForEvent(self);
-                    }
-                    else {
-                        self.isEventInValid = true;
-                    }
-                })
-            },
-            methods: {
-                SetValidateForEvent: function (self) {
-                    $.post('http://localhost:7071/api/ConfirmEvent', JSON.stringify(self.form), function (res) {
+                  $.post('http://localhost:7071/api/ConfirmEvent', JSON.stringify(self.form), function (res) {
                         var isEventValid = res.isValidated;
                         if (isEventValid != "true") {
                             self.isEventInValid = true;
                         }
                     })
-                }
+                //PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
+                
+            },
+            methods: {
+              
             },
             computed: {
                 // CREATE ANY CALCULATED PROPERTIES HERE. THEY BEHAVE LIKE READ-ONLY DATA
