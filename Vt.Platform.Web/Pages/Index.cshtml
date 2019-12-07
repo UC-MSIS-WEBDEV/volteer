@@ -12,6 +12,16 @@
             background-size: cover;
         }
 
+        #loading {
+            position: absolute;
+            top: 60%;
+            left: 38%;
+            margin-top: -50px;
+            margin-left: -50px;
+            width: 50px;
+            height: 50px;
+        }
+
         button {
             background-color: #4CAF50; /* Green */
             border: none;
@@ -101,7 +111,7 @@
         </div>
     </div>
     <div id="app" class="button-div">
-        <button type="button" data-toggle="modal" data-target="#getMyEventsModal" class="btn btn-primary">Get my Events</button>
+        <button type="button" data-toggle="modal" data-target="#getMyEventsModal" class="btn btn-primary float-right">Get my Events</button>
         <div id="getMyEventsModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -113,8 +123,14 @@
                     </div>
                     <form v-on:submit.stop.prevent="getMyEvents">
                         <div class="modal-body">
-                            <div v-if="getMyEventsSuccess">
+                            <div id="loading" style="display:none;">
+                                <img width="60" height="60" src="~/Images/giphy.gif" />
+                            </div>
+                            <div v-if="getMyEventsSuccess == 'success'">
                                 <p><strong style="color:green;">Success!</strong> An email has been sent with your events.</p>
+                            </div>
+                            <div v-if="getMyEventsSuccess == 'error'">
+                                <p><strong style="color:red;">Sorry!</strong> There is error sending the email.</p>
                             </div>
                             <div class="form-group">
                                 <label for="Name" class="fontStyle">Name</label>
@@ -145,16 +161,23 @@
             data: {
                 Name: "",
                 Email: "",
-                getMyEventsSuccess: false
+                getMyEventsSuccess: ""
             },
             methods: {
                 getMyEvents: function () {
                     var self = this;
-                    $.get('http://localhost:7071/api/GetMyEvents?mail=' + self.Email + '&name=' + self.Name, function (myEvents) {
-                        if (myEvents.metaData.success == true) {
-                            self.getMyEventsSuccess = true;
-                        }
-                    })
+                    $("#loading").show();
+                    $.get('http://localhost:7071/api/GetMyEvents?mail=' + self.Email + '&name=' + self.Name)
+                        .then((res) => {
+                            $("#loading").hide();
+                            self.getMyEventsSuccess = "success";
+
+                        })
+                        .catch((res) => {     
+                            self.getMyEventsSuccess = "error";
+                            $("#loading").hide();
+                            
+                        })
                     self.Name = "";
                     self.Email = "";
                 },
