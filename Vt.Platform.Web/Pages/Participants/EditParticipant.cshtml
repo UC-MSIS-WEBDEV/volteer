@@ -1,0 +1,95 @@
+﻿@page
+@model Vt.Platform.Web.Pages.Participants.EditParticipantModel
+@{
+    ViewData["Title"] = "EditParticipant";
+}
+
+
+    <div id="editStatus">
+        <h3>Update Participant Status</h3>
+    
+        <form class="form" v-on:submit.stop.prevent="editStatus">
+            <div class="input-group col-md-4 mt-3">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="radio" name="participantStatus" value="I am coming" v-model="status">
+                    </div>
+                </div>
+                <label class="form-control">I Can Come</label>
+            </div>
+            <div class="input-group col-md-4">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="radio" name="participantStatus" value="may be" v-model="status">
+                    </div>
+                </div>
+                <label class="form-control">Mybe</label>
+            </div>
+            <div class="input-group col-md-4">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="radio" name="participantStatus" value="cant come" v-model="status">
+                    </div>
+                </div>
+                <label class="form-control">I Can't Come</label>
+            </div>
+            <hr />
+            <div class="input-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+
+        <div v-if="isSuccess">
+            <div style="text-align:center">
+                Participation status has been updates sucessfully.
+            </div>
+        </div>
+        <div v-if="isError">
+            <div style="text-align:center">
+                OOPS! There was an error in changing the participation status.
+            </div>
+        </div>
+    </div>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+
+@section scripts{
+    <script>
+        var app = new Vue({
+            el: "#editStatus",
+            data: {
+                form: {
+                    EventCode: "SUSX27",
+                    ParticipantCode: "TNLU9Q",
+                    ParticipantStatus: ""
+                },
+                status : '',
+                isSuccess: false,
+                isError: false,
+            },
+            mounted: function () {
+                var self = this;
+                var url = window.location.href;
+            },
+            methods: {
+                editStatus: function () {
+                    var self = this;
+                    self.form.ParticipantStatus = self.status;
+                    console.log(JSON.stringify(self.form));
+                    
+                    $.post('http://localhost:7071/api/EditParticipantStatus', JSON.stringify(self.form), function (res) {
+                        if (res.metaData.success == true) {
+                            isSuccess = true;
+                        }
+                        else {
+                            isError = true;
+                        }
+                    })
+                }
+            },
+            computed: {
+            }
+        });
+    </script>
+
+}
+

@@ -229,6 +229,20 @@ namespace Vt.Platform.AzureDataTables.Repositories
             }
         }
 
+        public async Task UpdateParticipantStatusAsync(ParticipantDto participant)
+        {
+            var table = await GetTable("ParticipantData");
+            ParticipantDto existingEntry = await GetParticipantAsync(participant.EventCode, participant.ParticipantCode);
+
+            TableOperation retrieve = TableOperation.Retrieve<ParticipantTable>(participant.EventCode, participant.ParticipantCode);
+            TableResult result = await table.ExecuteAsync(retrieve);
+            ParticipantTable e = (ParticipantTable)result.Result;
+            e.ParticipantStatus = participant.ParticipantStatus;
+            e.ParticpantValidated = true;
+            TableOperation update = TableOperation.Replace(e);
+            await table.ExecuteAsync(update);
+        }
+
         public async Task<string> GetMyEventsAsync(string email)
         {
             string returningEmailBodyString = "Following are the vents you are involved in: <br> Events organized by you: <br>";
