@@ -7,12 +7,13 @@
 <h1 style="text-align:center">Event Cancellation</h1>
 <div id="cancelEvent">
     <div>
-        <p>You have initiated event cancellation. Please click the cancel button to cancel the event.</p>
+        <p>You have initiated event cancellation of <strong>{{eventName}}</strong> scheduled at {{eventDate}}.</p>
+        <p>Please click the <em>confirm cancellation</em> button below to cancel the event.</p>
         <button class="btn btn-primary" v-on:click="confirmCancel">Confirm Event Cancellation</button>
     </div>
     <div v-if="cancelSuccess">
         <div style="text-align:center">
-            <h4>The event {{form.EventCode}} has been cancelled.</h4>
+            <h4>The event {{eventName}} has been cancelled.</h4>
 
         </div>
     </div>
@@ -28,9 +29,25 @@
                     ConfirmationCode: ""
                 },
                 eventName: "",
+                eventDate: "",
                 cancelSuccess: false
             },
             mounted: function () {
+                var self = this;
+                var pageURL = window.location.href;
+                var array = pageURL.split('?');
+                var params = array[array.length - 1];
+                var separateParams = params.split('/');
+                var eventCode = separateParams[0];
+                var confirmationCode = separateParams[1];
+                self.form.EventCode = eventCode;
+                $.get('http://localhost:7071/api/GetEvent?eventcode=' + eventCode, function (event) {
+                    console.log('error-->' + event.metaData.success);
+                    if (event.metaData.success == true) {
+                        self.eventName = event.summary;
+                        self.eventDate = event.eventDate;
+                    }
+                })
 
             },
             methods: {
