@@ -1,0 +1,83 @@
+﻿@page
+@model Vt.Platform.Web.Pages.EditParticipantModel
+@{
+    ViewData["Title"] = "EditParticipant";
+}
+<h1>List of Participants</h1>
+<div id="app">
+    <div>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr :value="list.key" v-for="list in eventParticipants">
+                    <td>{{ list.tempname }}</td>
+                    <td class="text-center">
+                        <span><button v-if="list.status == 'Confirmed'" type="button" class="btn btn-success" disabled>Yes</button><button type="button" class="btn btn-success" v-else v-on:click="postParticipation('DMXWOC', 'I am coming')">Yes</button></span>
+                        <span><button v-if="list.status == 'Tentative'" type="button" class="btn btn-primary" disabled>Maybe</button><button type="button" class="btn btn-primary" v-else>Maybe</button></span>
+                        <span><button v-if="list.status == 'No'" type="button" class="btn btn-danger" disabled>No</button><button type="button" class="btn btn-danger" v-else>No</button></span>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                eventParticipants: []
+            },
+            mounted: function () {
+                var self = this;
+                var pageURL = window.location.href;
+                    var array = pageURL.split('?');
+                    var params = array[array.length - 1];
+                    var separateParams = params.split('/');
+                var eventCode = separateParams[0];
+                $.get('http://localhost:7071/api/GetParticipants?eventCode=' + eventCode, function (data) {
+                    var participantsList = data.participants;
+                    for (var i = 0; i < participantsList.length; i++) {
+                        self.eventParticipants.push({ tempname: participantsList[i].name, name: participantsList[i].participantName, status: participantsList[i].status.name, key: participantsList[i].participantCode });
+
+                    }
+                    console.log(self.eventParticipants);
+                })
+
+            },
+            methods: {
+                postParticipation: function (pid, status) {
+                    var pageURL = window.location.href;
+                    var array = pageURL.split('?');
+                    var params = array[array.length - 1];
+                    var separateParams = params.split('/');
+                    var eventCode = separateParams[0];
+                    eventCode = '1XGHC2';
+                    var form = { "EventCode": eventCode, "ParticipantCode": pid, "ParticipantStatus": status }
+                    $.ajax({
+                        url : 'http://localhost:7071/api/EditParticipantStatus',
+                        type : 'POST',
+                        data : JSON.stringify(form),
+                        dataType:'json',
+                        success : function(data) {              
+                            self.isSuccess = true;
+                        },
+                        error : function(request,error)
+                        {
+                            self.isError = true;
+                        }
+                    });
+                }
+            }
+        })
+    </script>
+}
+
+
