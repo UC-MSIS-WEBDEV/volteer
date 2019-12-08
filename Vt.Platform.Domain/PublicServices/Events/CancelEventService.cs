@@ -30,7 +30,8 @@ namespace Vt.Platform.Domain.PublicServices.Events
             var dto = new EventDto
             {
                 EventCode = request.EventCode,
-                ConfirmationCode = request.ConfirmationCode                
+                ConfirmationCode = request.ConfirmationCode
+               
             };
 
             // UPDATE IN REPOSITORY
@@ -38,7 +39,11 @@ namespace Vt.Platform.Domain.PublicServices.Events
 
             var response = new Response
             {
-                EventCode = request.EventCode
+                EventCode = request.EventCode,
+                 EventSummary = dto.EventSummary,
+                EventDetails = dto.EventDetails,
+
+                EventDate = dto.EventDate,
             };
             return response;
         }
@@ -69,6 +74,7 @@ namespace Vt.Platform.Domain.PublicServices.Events
             public string OrganizerName { get; set; }
             public string EventDetails { get; set; }
             public string EventSummary { get; set; }
+            public DateTime EventDate { get; set; }
             public bool OrganizerValidated { get; set; }
         }
     }

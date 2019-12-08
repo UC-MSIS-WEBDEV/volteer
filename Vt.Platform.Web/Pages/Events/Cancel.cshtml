@@ -8,11 +8,11 @@
 <div id="cancelEvent">
     <div>
         <p>You have initiated event cancellation. Please click the cancel button to cancel the event.</p>
-        <button class="btn btn-primary" v-on:click="confirmCancel">Cancel</button>
+        <button class="btn btn-primary" v-on:click="confirmCancel">Confirm Event Cancellation</button>
     </div>
     <div v-if="cancelSuccess">
         <div style="text-align:center">
-            <h4>{{form.EventCode}} The event has been cancelled.</h4>
+            <h4>The event {{form.EventCode}} has been cancelled.</h4>
 
         </div>
     </div>

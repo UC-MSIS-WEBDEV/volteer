@@ -202,9 +202,14 @@
                             self.eventLocation = event.address1 +", " + event.city;
                             var marker = event.latitude + "," + event.longitude;
                             self.mapURL = 'https://maps.googleapis.com/maps/api/staticmap?center=' + marker + '&zoom=15&size=500x400&&markers=color:blue%7Clabel:S%7C' + marker + '&maptype=roadmap&key=AIzaSyDYDbRCC6MTGwSB1RvdbVGbBffv14pcffY';
-                            eventDateCheck = new Date(event.eventdate);
+                            eventDate = new Date(event.eventDate);
+                            console.log(eventDate);
                             todayDate = new Date();
-                            difference = todayDate - eventDateCheck;
+                            console.log(todayDate);
+                            difference = todayDate - eventDate;
+                            console.log(difference);
+                         
+
                             $("#loading").hide();
                             self.isLoading = false;
                             self.showEvent = true;
@@ -229,6 +234,7 @@
                     var self = this;
                     self.participantForm.ParticipantStatus = "I am coming";
                     console.log("status1-->" + self.participantForm.ParticipantStatus);
+                    
                 },
                 setMaybeStatus: function () {
                     var self = this;
