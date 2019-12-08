@@ -5,44 +5,105 @@
 }
 
 
-<div id="app">
-    <div class="d-none d-md-block">
-       
-        <div class="spinner-border" role="status" v-if="isLoading">
-            <span class="sr-only">Loading...</span>
-        </div>
-        <br />
-        <div v-if="eventExpired">
-            <p style="font-family:Georgia; font-size:25px;">This event is not valid or has expired. Please check your event code and try again.</p>
-        </div>
-        <div v-else>
-            <div class="row" v-if="showEvent">
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title" align="center" style="font-family:Georgia; font-size:30px;">{{ eventName }}</h5>
-                            <h6 style="font-family:Georgia; font-size:25px;">Organizer</h6>
-                            <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ organizerName }}</p>
-                            <h6 style="font-family:Georgia; font-size:25px;">Details</h6>
-                            <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ eventDetails }}</p>
-                            <h6 style="font-family:Georgia; font-size:25px;">Location</h6>
-                            <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ eventLocation }}</p>
-                            <img v-bind:src="mapURL">
+    <div id="app">
+        <div class="d-none d-md-block">
+
+            <div class="spinner-border" role="status" v-if="isLoading">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <br />
+            <div v-if="eventExpired">
+                <p style="font-family:Georgia; font-size:25px;">This event is not valid or has expired. Please check your event code and try again.</p>
+            </div>
+            <div v-else>
+                <div class="row" v-if="showEvent">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title" align="center" style="font-family:Georgia; font-size:30px;">{{ eventName }}</h5>
+                                <h6 style="font-family:Georgia; font-size:25px;">Organizer</h6>
+                                <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ organizerName }}</p>
+                                <h6 style="font-family:Georgia; font-size:25px;">Details</h6>
+                                <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ eventDetails }}</p>
+                                <h6 style="font-family:Georgia; font-size:25px;">Event Date</h6>
+                                <p style="font-family:Lucida Console; font-size:18px;">{{ eventDate }}</p>
+                                <h6 style="font-family:Georgia; font-size:25px;">Location</h6>
+                                <p class="card-text" style="font-family:Lucida Console; font-size:18px;">{{ eventLocation }}</p>
+                                <img v-bind:src="mapURL">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title" align="center">Who's Coming?</h5>
+                                <div class="btn-group btn-group-justified" align="center">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px" v-on:click="setComingStatus">I can come</button>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px" v-on:click="setMaybeStatus">maybe</button>
+                                    <button class="btn btn-primary" style="width:160px">can't come</button>
+                                </div>
+                                <br />
+                                <br />
+                                <h4 style="font-family:Times New Roman;">List of Participants</h4>
+                                <div style="height:300px; overflow-y:auto;">
+                                    <table class="table table-striped">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="list in eventParticipants">
+                                                <td>{{ list.name }}</td>
+                                                <td v-if="list.status == 'I am coming'"><span class="badge badge-pill badge-success">Yes</span></td>
+                                                <td v-else><span class="badge badge-pill badge-warning">maybe</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title" align="center">Who's Coming?</h5>
-                            <div class="btn-group btn-group-justified" align="center">
-                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px" v-on:click="setComingStatus">I can come</button>
-                                <button class="btn btn-primary" data-toggle="modal" data-target="#getModal" style="width:160px" v-on:click="setMaybeStatus">maybe</button>
-                                <button class="btn btn-primary" style="width:160px">can't come</button>
-                            </div>
-                            <br />
-                            <br />
-                            <h4 style="font-family:Times New Roman;">List of Participants</h4>
+            </div>
+
+
+        </div>
+        <div class="d-md-none">
+
+            <br />
+            <div v-if="eventExpired">
+                <p style="font-family:Georgia; font-size:25px;">This event is not valid or has expired. Please check your event code and try again.</p>
+            </div>
+            <div v-else>
+                <div v-if="showEvent">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a class="nav-item nav-link active" id="nav-event-tab" data-toggle="tab" href="#nav-eventDetails" role="tab" aria-controls="nav-eventDetails" aria-selected="true">Event Details</a>
+                            <a class="nav-item nav-link" id="nav-coming-tab" data-toggle="tab" href="#nav-partsDetails" role="tab" aria-controls="nav-partsDetails" aria-selected="false">Who's Coming?</a>
+                        </div>
+                    </nav>
+                    <br />
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-eventDetails" role="tabpanel" aria-labelledby="nav-event-tab">
+                            <h5 align="center" style="font-family:Georgia; font-size:30px;">{{ eventName }}</h5>
+                            <h6 style="font-family:Georgia; font-size:25px;">Organizer</h6>
+                            <p style="font-family:Lucida Console; font-size:18px;">{{ organizerName }}</p>
+                            <h6 style="font-family:Georgia; font-size:25px;">Details</h6>
+                            <p style="font-family:Lucida Console; font-size:18px;">{{ eventDetails }}</p>
+                            <h6 style="font-family:Georgia; font-size:25px;">Event Date</h6>
+                            <p style="font-family:Lucida Console; font-size:18px;">{{ eventDate }}</p>
+                            <h6 style="font-family:Georgia; font-size:25px;">Location</h6>
+                            <p style="font-family:Lucida Console; font-size:18px;">{{ eventLocation }}</p>
+                            <img v-bind:src="mapURL">
+                        </div>
+                        <div class="tab-pane fade" id="nav-partsDetails" role="tabpanel" aria-labelledby="nav-coming-tab">
+                            <div>
+                                <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary" v-on:click="setComingStatus">I can come</button>
+                                <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary" v-on:click="setMaybeStatus">maybe</button>
+                                <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">can't come</button>
+                            </div>&nbsp
                             <div style="height:300px; overflow-y:auto;">
                                 <table class="table table-striped">
                                     <thead class="thead-dark">
@@ -64,93 +125,40 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-
-    </div>
-    <div class="d-md-none">
-       
-        <br />
-        <div v-if="eventExpired">
-            <p style="font-family:Georgia; font-size:25px;">This event is not valid or has expired. Please check your event code and try again.</p>
         </div>
-        <div v-else>
-            <div v-if="showEvent">
-                <nav>
-                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link active" id="nav-event-tab" data-toggle="tab" href="#nav-eventDetails" role="tab" aria-controls="nav-eventDetails" aria-selected="true">Event Details</a>
-                        <a class="nav-item nav-link" id="nav-coming-tab" data-toggle="tab" href="#nav-partsDetails" role="tab" aria-controls="nav-partsDetails" aria-selected="false">Who's Coming?</a>
+        <div id="getModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Please provide your information</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                </nav>
-                <br />
-                <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade show active" id="nav-eventDetails" role="tabpanel" aria-labelledby="nav-event-tab">
-                        <h5 align="center" style="font-family:Georgia; font-size:30px;">{{ eventName }}</h5>
-                        <h6 style="font-family:Georgia; font-size:25px;">Organizer</h6>
-                        <p style="font-family:Lucida Console; font-size:18px;">{{ organizerName }}</p>
-                        <h6 style="font-family:Georgia; font-size:25px;">Details</h6>
-                        <p style="font-family:Lucida Console; font-size:18px;">{{ eventDetails }}</p>
-                        <h6 style="font-family:Georgia; font-size:25px;">Location</h6>
-                        <p style="font-family:Lucida Console; font-size:18px;">{{ eventLocation }}</p>
-                    </div>
-                    <div class="tab-pane fade" id="nav-partsDetails" role="tabpanel" aria-labelledby="nav-coming-tab">
-                        <div>
-                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary" v-on:click="setComingStatus">I can come</button>
-                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary" v-on:click="setMaybeStatus">maybe</button>
-                            <button type="button" data-toggle="modal" data-target="#getModal" class="btn btn-primary">can't come</button>
-                        </div>&nbsp
-                        <div style="height:300px; overflow-y:auto;">
-                            <table class="table table-striped">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="list in eventParticipants">
-                                        <td>{{ list.name }}</td>
-                                        <td v-if="list.status == 'I am coming'"><span class="badge badge-pill badge-success">Yes</span></td>
-                                        <td v-else><span class="badge badge-pill badge-warning">maybe</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <form class="participantForm" v-on:submit.stop.prevent="createParticipant">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="participantName" class="fontStyle">Name</label>
+                                <input type="text" class="form-control" id="participantName" placeholder="Participant Name" v-model="participantForm.ParticipantName" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="participantEmail" class="fontStyle">Email</label>
+                                <input type="email" class="form-control" id="participantEmail" placeholder="Participant Email" v-model="participantForm.ParticipantEmail" required />
+                            </div>
                         </div>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
-    </div>
-    <div id="getModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Please provide your information</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form class="participantForm" v-on:submit.stop.prevent="createParticipant">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="participantName" class="fontStyle">Name</label>
-                            <input type="text" class="form-control" id="participantName" placeholder="Participant Name" v-model="participantForm.ParticipantName" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="participantEmail" class="fontStyle">Email</label>
-                            <input type="email" class="form-control" id="participantEmail" placeholder="Participant Email" v-model="participantForm.ParticipantEmail" required />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit"  v-on:click="setComingStatus()" class="btn btn-primary" data-dismiss="modal">Save changes</button>
-                    </div>
-                </form>
-            </div>
+        <div id="loading" style="display:none;">
+            <img width="120" height="120" src="~/img/giphy.gif">
         </div>
     </div>
-</div>
 
 @section scripts{
     <script>
@@ -163,6 +171,8 @@
                 organizerName: "",
                 eventName: "",
                 eventDetails: "",
+                eventDate:"",
+
                 eventLocation: "",
                 mapURL: "",
                 eventCode: "",
@@ -176,24 +186,26 @@
                 }
             },
             mounted: function () {
-                debugger;
                 var self = this;
                 self.isLoading = true;
                   var pageURL = window.location.href;
                 var array = pageURL.split('?');
                 var eventCode = array[array.length - 1];
+                $("#loading").show();
                     $.get('http://localhost:7071/api/GetEvent?eventcode=' + eventCode, function (event) {
                         console.log('error-->' + event.metaData.success);
                         if (event.metaData.success == true) {
                             self.organizerName = event.organizerName;
                             self.eventName = event.summary;
                             self.eventDetails = event.details;
-                            self.eventLocation = "lat: " + event.latitude + "  long: " + event.longitude;
+                            self.eventDate = event.eventDate;
+                            self.eventLocation = event.address1 +", " + event.city;
                             var marker = event.latitude + "," + event.longitude;
                             self.mapURL = 'https://maps.googleapis.com/maps/api/staticmap?center=' + marker + '&zoom=15&size=500x400&&markers=color:blue%7Clabel:S%7C' + marker + '&maptype=roadmap&key=AIzaSyDYDbRCC6MTGwSB1RvdbVGbBffv14pcffY';
                             eventDateCheck = new Date(event.eventdate);
                             todayDate = new Date();
                             difference = todayDate - eventDateCheck;
+                            $("#loading").hide();
                             self.isLoading = false;
                             self.showEvent = true;
                             if (difference > 0) {
