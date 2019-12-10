@@ -222,7 +222,7 @@
 
                     })
                 $.get('http://localhost:7071/api/GetParticipants?eventCode=' + eventCode, function (data) {
-                    debugger;
+                    
                         var participantsList = data.participants;
                         for (var i = 0; i < participantsList.length; i++) {
                             self.eventParticipants.push({ name: participantsList[i].participantName, status: participantsList[i].participantStatus });
