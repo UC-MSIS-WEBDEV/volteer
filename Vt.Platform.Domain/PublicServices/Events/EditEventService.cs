@@ -91,18 +91,22 @@ namespace Vt.Platform.Domain.PublicServices.Events
             public string EventCode { get; set; }
             public string OrganizerCode { get; set; }
             public string ConfirmationCode { get; set; }
-            [Required]
+            [Required(ErrorMessage = "Name is required")]
             public string OrganizerName { get; set; }
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Email is required")]
+            [EmailAddress(ErrorMessage = "Email is invalid")]
             public string OrganizerEmail { get; set; }
+            [Required(ErrorMessage = "Date is required")]
+            [DataType(DataType.Date)]
             public DateTime EventDate { get; set; }
-            [Required]
+            [Required(ErrorMessage = "Summary is required")]
             public string EventSummary { get; set; }
             public string EventDetails { get; set; }
+            [Required(ErrorMessage = "Location is required")]
             public string EventLocation { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Number of participants is required")]
+            [Range(0, int.MaxValue, ErrorMessage = "Please enter valid Number")]
             public int? NumberOfParticipants { get; set; }
             public double EventLatitude { get; set; }
             public double EventLongitude { get; set; }
