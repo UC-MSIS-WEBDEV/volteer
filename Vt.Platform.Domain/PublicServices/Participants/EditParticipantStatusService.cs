@@ -31,9 +31,15 @@ namespace Vt.Platform.Domain.PublicServices.Participants
             }
 
             participant.ParticipantStatus = request.ParticipantStatus;
-           
+
             // UPDATE IN REPOSITORY
-            await _dataRepository.UpdateParticipantStatusAsync(participant);
+            if (request.ConfirmationCode.Equals(participant.ConfirmationCode))
+            {
+                await _dataRepository.UpdateParticipantStatusAsync(participant);
+            }
+            else {
+                throw new Exception("Confirmation code Invalid");
+            }
 
             var response = new Response 
             { 
@@ -60,6 +66,8 @@ namespace Vt.Platform.Domain.PublicServices.Participants
             public string EventCode { get; set; }
             [Required]
             public string ParticipantCode { get; set; }
+            [Required]
+            public string ConfirmationCode { get; set; }
             [Required]
             public string ParticipantStatus { get; set; }
         }

@@ -74,6 +74,7 @@ namespace Vt.Platform.AzureDataTables.Repositories
             dto.ParticipantEmail = table.ParticipantEmail;
             dto.ParticipantStatus = table.ParticipantStatus;
             dto.ParticipantValidated = table.ParticpantValidated;
+            dto.ConfirmationCode = table.ConfirmationCode;
         }
 
 

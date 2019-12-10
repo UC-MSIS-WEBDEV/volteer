@@ -46,7 +46,7 @@
         </div>
         <div v-if="isError">
             <div class="alert alert-danger mt-5" role="alert">
-                Participant status update failed
+                {{errormessage}}
             </div>
         </div>
     </div>
@@ -59,11 +59,13 @@
                 form: {
                     EventCode: "",
                     ParticipantCode: "",
-                    ParticipantStatus: ""
+                    ParticipantStatus: "",
+                    ConfirmationCode: ""
                 },
                 status : '',
                 isSuccess: false,
                 isError: false,
+                errormessage:''
             },
             mounted: function () {
                 
@@ -80,6 +82,7 @@
                     var participantCode = separateParams[1];
                     self.form.ParticipantCode = participantCode;
                     self.form.ParticipantStatus = self.status;
+                    self.form.ConfirmationCode = separateParams[2];
                     console.log(JSON.stringify(self.form));
                     
                     $.ajax({
@@ -90,9 +93,10 @@
                         success : function(data) {              
                             self.isSuccess = true;
                         },
-                        error : function(request,error)
+                        error : function(reponse,error)
                         {
                             self.isError = true;
+                            self.errormessage = reponse.responseJSON.metaData.description;
                         }
                     });
                  }
