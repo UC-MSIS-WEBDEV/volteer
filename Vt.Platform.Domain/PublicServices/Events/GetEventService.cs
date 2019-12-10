@@ -34,12 +34,9 @@ namespace Vt.Platform.Domain.PublicServices.Events
                 NumberOfParticipantsRequested = RetDto.NumberOfParticipants,
                 EventDate = RetDto.EventDate,
                 Location = RetDto.EventLocation,
-                /*Longitude = -84.5145203,
-                Address1 = "2906 Woodside Drive",
-                Address2 = "",
-                City = "Cincinnati",
-                PostalCode = "45221",
-                State = "OH"*/
+                OrganizerEmail = RetDto.OrganizerEmail,
+                OrganizerCode = RetDto.OrganizerCode
+                
             };
         }
 
@@ -58,7 +55,9 @@ namespace Vt.Platform.Domain.PublicServices.Events
         public class Response : BaseResponse
         {
             public string EventCode { get; set; }
+            public string OrganizerCode { get; set; }
             public string OrganizerName { get; set; }
+            public string OrganizerEmail { get; set; }
             public DateTime EventDate { get; set; }
             public string Summary { get; set; }
             public string Details { get; set; }

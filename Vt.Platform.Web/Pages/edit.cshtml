@@ -96,6 +96,7 @@
                     numberofparticipants: "",
                     eventlatitude: "",
                     EventLongitude: "",
+                    organizerCode: ""
                 },
                 show: false,
                 isErrorForm: false,
@@ -109,7 +110,7 @@
                 var self = this;
                 self.loadData();
 
-                console.log("mounted");
+                
                 // PERFORM ANY ACTIONS WHEN THE PAGE LOADS HERE - SIMILAR TO JQUERY DOCUMENT.READY
                 this.autocomplete = new google.maps.places.Autocomplete(this.$refs.autocomplete);
 
@@ -169,12 +170,17 @@
                     self.form.numberofparticipants = data.numberOfParticipantsRequested;
                     self.form.eventlatitude = data.eventlatitude;
                     self.form.EventLongitude = data.EventLongitude;
+                    self.form.organizerCode = data.organizerCode;
 
                 },
                 loadData: function () {
                     var self = this;
                     var urlload = this.getAllUrlParams(this.url).eventcode;
                     var urlCode = urlload.toUpperCase();
+                    var urlAdmin = this.getAllUrlParams(this.url).admincode;
+                    console.log(urlAdmin);
+                    var urlAdminUse = urlAdmin.toLowerCase();
+                    console.log(urlAdminUse);
                     var setdata = [];
 
                     $.ajax({
@@ -183,23 +189,20 @@
                         contentType: 'application/json',
                         method: 'GET'
                     }).done(function (responseJSON, status, xhr) {
-                        console.log(responseJSON);
+                        console.log(responseJSON.organizerCode);
+                        if (responseJSON.organizerCode == urlAdminUse) {
 
-                        setdata = responseJSON;
+                            setdata = responseJSON;
 
-                        console.log(setdata);
+                            self.setVueData(setdata);
 
-                        /*$("#organizername").val(responseJSON.organizerName);
-                        $("#eventsummary").val(responseJSON.summary);
-                        $("#organizeremail").val(responseJSON.organizerEmail);
-                        $("#eventdetails").val(responseJSON.details);
-                        $("#eventdate").val(responseJSON.eventDate);
-                        $("#eventlocation").val(responseJSON.location);
-                        $("#noofparticipants").val(responseJSON.numberOfParticipantsRequested);
-                        $("#eventlatitude").val(responseJSON.eventlatitude);
-                        $("#EventLongitude").val(responseJSON.EventLongitude);*/
-
-                        self.setVueData(setdata);
+                        }
+                        else {
+                            alert("You are not authorized to edit this event");
+                            //window.location.replace("/display?eventcode="+urlCode);
+                            
+                        }
+                        
 
                     }).fail(function (xhr, status, error) {
                         console.log("fail", xhr, status, error);
