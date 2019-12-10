@@ -9,52 +9,48 @@
         <br />
         <p style="color:red" v-if="isErrorForm">Please resolve the below error</p>
         <div class="row">
-            <div class="col-4">
-                <label for="organizername">Organizer Name</label>
-                <input type="text" class="form-control" id="organizername" placeholder="" v-model="form.organizername" required>
+            <div class="col-md-6">
+                <div>
+                    <label for="organizername">Organizer Name</label>
+                    <input type="text" class="form-control" id="organizername" placeholder="" v-model="form.organizername" required>
+                </div>
+                <div>
+                    <label for="organizeremail">Organizer Email</label>
+                    <input type="text" class="form-control" id="organizeremail" placeholder="" v-model="form.organizeremail" required>
+                </div>
+                <div>
+                    <label for="eventdate">Event Date</label>
+                    <input type="datetime-local" class="form-control" id="eventdate" placeholder="" v-model="form.eventdate" required>
+                    <p style="color:red" v-if="isEventDateError">Event Date must be in future, can only 90 days out</p>
+                </div>
+                <div>
+                    <label for="noofparticipants">Number of Participants</label>
+                    <input type="number" class="form-control" id="noofparticipants" placeholder="" v-model="form.numberofparticipants" required>
+                </div>
             </div>
-            <div class="col-1">
-            </div>
-            <div class="col-5">
-                <label for="eventsummary">Event Summary</label>
-                <input type="text" class="form-control" id="eventsummary" placeholder="" v-model="form.eventsummary" required>
-                <p style="color:red" v-if="form.eventsummary.length >= 140">Summary should be with in 140 characters</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-4">
-                <label for="organizeremail">Organizer Email</label>
-                <input type="text" class="form-control" id="organizeremail" placeholder="" v-model="form.organizeremail" required>
-            </div>
-            <div class="col-1">
-            </div>
-            <div class="col-5">
-                <label for="eventdetails">Event Details</label>
-                <textarea class="form-control" v-model="form.eventdetails" id="eventdetails" placeholder=""></textarea>
-                <p style="color:red" v-if="form.eventdetails.length >= 750">Details should be with in 750 characters</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-4">
-                <label for="eventdate">Event Date</label>
-                <input type="datetime-local" class="form-control" id="eventdate" placeholder="" v-model="form.eventdate" required>
-                <p style="color:red" v-if="isEventDateError">Event Date must be in future, can only 90 days out</p>
-            </div>
-            <div class="col-1">
-            </div>
-            <div class="col-5">
-                <label for="location">Location</label>
-                <input ref="autocomplete" id="eventlocation" v-model="form.eventlocation" placeholder="Search" class="form-control" type="text" />
 
 
+
+
+            <div class="col-md-6">
+                <div>
+                    <label for="eventsummary">Event Summary</label>
+                    <input type="text" class="form-control" id="eventsummary" placeholder="" v-model="form.eventsummary" required>
+                    <p style="color:red" v-if="form.eventsummary.length >= 140">Summary should be with in 140 characters</p>
+                </div>
+                <div>
+                    <label for="eventdetails">Event Details</label>
+                    <textarea class="form-control" v-model="form.eventdetails" id="eventdetails" placeholder=""></textarea>
+                    <p style="color:red" v-if="form.eventdetails.length >= 750">Details should be with in 750 characters</p>
+                </div>
+                <div>
+                    <label for="location">Location</label>
+                    <input ref="autocomplete" id="eventlocation" v-model="form.eventlocation" placeholder="Search" class="form-control" type="text" />
+                </div>
             </div>
+
         </div>
-        <div class="row">
-            <div class="col-4">
-                <label for="noofparticipants">Number of Participants</label>
-                <input type="number" class="form-control" id="noofparticipants" placeholder="" v-model="form.numberofparticipants" required>
-            </div>
-        </div>
+
         <br />
         <div style="text-align:center">
             <button type="submit" class="btn btn-primary">Sumbit Changes</button>
@@ -69,7 +65,7 @@
                 <div class="modal-body">
                     <div v-if="response.success">
                         <p style="color:limegreen">Successfully Edited Event</p>
-                        
+
                     </div>
                     <div v-else>
                         <p style="color:red">Error in creation. Please try again!</p>
@@ -193,7 +189,7 @@
 
                         console.log(setdata);
 
-                        $("#organizername").val(responseJSON.organizerName);
+                        /*$("#organizername").val(responseJSON.organizerName);
                         $("#eventsummary").val(responseJSON.summary);
                         $("#organizeremail").val(responseJSON.organizerEmail);
                         $("#eventdetails").val(responseJSON.details);
@@ -201,7 +197,7 @@
                         $("#eventlocation").val(responseJSON.location);
                         $("#noofparticipants").val(responseJSON.numberOfParticipantsRequested);
                         $("#eventlatitude").val(responseJSON.eventlatitude);
-                        $("#EventLongitude").val(responseJSON.EventLongitude);
+                        $("#EventLongitude").val(responseJSON.EventLongitude);*/
 
                         self.setVueData(setdata);
 
